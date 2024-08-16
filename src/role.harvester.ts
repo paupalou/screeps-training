@@ -5,11 +5,15 @@ const HARVESTER = 'harvester';
 interface RoleHarvester {
     role: string;
     count: () => number;
+    all: () => Creep[];
     run: (creep: Creep) => void;
 }
 
 const Harvester: RoleHarvester = {
     role: HARVESTER,
+    all: function () {
+        return _.filter(Game.creeps, creep => creep.memory.role === HARVESTER);
+    },
     count: function () {
         return _.filter(Game.creeps, creep => creep.memory.role === HARVESTER).length;
     },
@@ -23,9 +27,10 @@ const Harvester: RoleHarvester = {
             const targets = creep.room.find(FIND_STRUCTURES, {
                 filter: structure => {
                     return (
-                        (structure.structureType == STRUCTURE_EXTENSION ||
+                        (structure.structureType == STRUCTURE_CONTAINER ||
+                            structure.structureType == STRUCTURE_EXTENSION ||
                             structure.structureType == STRUCTURE_SPAWN) &&
-                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                        structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
                     );
                 }
             });

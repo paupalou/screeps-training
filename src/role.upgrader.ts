@@ -1,8 +1,16 @@
+import _ from 'lodash';
+
+const BUILDER = 'builder';
+
 interface RoleUpgrader {
     run: (creep: Creep) => void;
+    count: () => number;
 }
 
 const Upgrader: RoleUpgrader = {
+    count: function () {
+        return _.filter(Game.creeps, creep => creep.memory.role === BUILDER).length;
+    },
     run: function (creep) {
         if (creep.store.energy === 0 || (!creep.memory.upgrading && creep.store.getFreeCapacity() > 0)) {
             creep.memory.upgrading = false;

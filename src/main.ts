@@ -35,9 +35,13 @@ function respawnCreeps() {
 
     const harvesterCount = creeps.harvester.length;
     const builderCount = creeps.builder.length;
+    const upgraderCount = creeps.upgrader.length;
 
     if (harvesterCount < 4) {
         const nextHarvesterNumber = harvesterCount + 1;
+        const harvesterTypes = _.groupBy(Harvester.all(), 'memory.sourceId');
+        log(harvesterTypes);
+
         const harvester = {
             actions: [WORK, CARRY, MOVE],
             name: `Harvester${nextHarvesterNumber}`,
@@ -45,14 +49,17 @@ function respawnCreeps() {
             opts: {
                 memory: {
                     role: 'harvester',
-                    sourceId: nextHarvesterNumber % 2 === 0 ? RoomEnergySources.SOUTH : RoomEnergySources.NORTH
+                    sourceId:
+                        harvesterTypes[RoomEnergySources.SOUTH].length > harvesterTypes[RoomEnergySources.NORTH].length
+                            ? RoomEnergySources.NORTH
+                            : RoomEnergySources.SOUTH
                 }
             }
         };
         createCreep(harvester);
     }
 
-    if (creeps.builder.length === 1) {
+    if (builderCount === 1) {
         const nextBuilderNumber = builderCount + 1;
         const builder = {
             actions: [WORK, CARRY, MOVE],
@@ -66,7 +73,7 @@ function respawnCreeps() {
             }
         };
         createCreep(builder);
-    } else if (creeps.builder.length === 0) {
+    } else if (builderCount < 1) {
         const builder = {
             actions: [WORK, CARRY, MOVE],
             name: 'Builder1',
@@ -76,6 +83,18 @@ function respawnCreeps() {
             }
         };
         createCreep(builder);
+    }
+
+    if (upgraderCount < 1) {
+        const upgrader = {
+            actions: [WORK, CARRY, MOVE],
+            name: 'Upgrader1',
+            spawn: 'Spawn1',
+            opts: {
+                memory: { role: 'upgrader' }
+            }
+        };
+        createCreep(upgrader);
     }
 }
 
@@ -92,7 +111,7 @@ function createCreep(
         log(`Not enough energy to create ${creep.name}`);
     } else if (result === ERR_NAME_EXISTS) {
         const duplicatedCreepNumber = Number(creep.name.slice(-1));
-        const nextCreepName = creep.name.slice(0, -1) + String(duplicatedCreepNumber + 1);
+        const nextCreepName = creep.name.slice(0, -1) + String(duplicatedCreepNumber + 2);
         log(`Creep named ${creep.name} already exists, trying with ${nextCreepName}`);
         const nextCreep = { ...creep, name: nextCreepName };
         createCreep(nextCreep);
@@ -119,7 +138,7 @@ export function loop(): void {
             continue;
         }
 
-        if (Harvester.count() >= 4 && creep.memory.role === 'builder') {
+        if (Upgrader.count() > 0 && Harvester.count() >= 4 && creep.memory.role === 'builder') {
             Builder.run(creep);
             continue;
         }
