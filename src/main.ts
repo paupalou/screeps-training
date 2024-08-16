@@ -1,13 +1,80 @@
+import _ from 'lodash';
+
 import Harvester from './role.harvester';
 import Builder from './role.builder';
 import Upgrader from './role.upgrader';
 
-function noCreeps() {
-    return Object.keys(Game.creeps).length === 0;
+enum RoomEnergySources {
+    NORTH = '5bbcae009099fc012e63846e',
+    SOUTH = '5bbcae009099fc012e638470'
 }
 
-function createCreep(creep = { actions: [WORK, CARRY, MOVE], name: 'Harvester1', spawn: 'Spawn1' }) {
-    Game.spawns[creep.spawn].spawnCreep(creep.actions, creep.name, { memory: { role: 'harvester' } });
+function log(something: unknown) {
+    if (typeof something === 'string') {
+        console.log(something);
+        return;
+    }
+
+    if (typeof something === 'object') {
+        console.log(JSON.stringify(something, null, 2));
+        return;
+    }
+}
+
+function respawnCreeps() {
+    const creeps: Record<string, Creep[]> = {
+        harvester: [],
+        builder: [],
+        upgrader: []
+    };
+
+    for (const name in Game.creeps) {
+        const creep = Game.creeps[name];
+        creeps[creep.memory.role] && creeps[creep.memory.role].push(creep);
+    }
+
+    const harvesterCount = creeps.harvester.length;
+
+    if (harvesterCount < 4) {
+        const nextHarvesterNumber = harvesterCount + 1;
+        const harvester = {
+            actions: [WORK, CARRY, MOVE],
+            name: `Harvester${nextHarvesterNumber}`,
+            spawn: 'Spawn1',
+            opts: {
+                memory: {
+                    role: 'harvester',
+                    sourceId: nextHarvesterNumber % 2 === 0 ? RoomEnergySources.SOUTH : RoomEnergySources.NORTH
+                }
+            }
+        };
+        createCreep(harvester);
+    }
+
+    if (creeps.builder.length === 0) {
+        const builder = {
+            actions: [WORK, CARRY, MOVE],
+            name: 'Builder1',
+            spawn: 'Spawn1',
+            opts: {
+                memory: { role: 'builder' }
+            }
+        };
+        createCreep(builder);
+    }
+}
+
+function createCreep(
+    creep = {
+        actions: [WORK, CARRY, MOVE],
+        name: 'Harvester1',
+        spawn: 'Spawn1',
+        opts: { memory: { role: 'harvester' } }
+    }
+) {
+    if (Game.spawns[creep.spawn].spawnCreep(creep.actions, creep.name, creep.opts) === ERR_NOT_ENOUGH_ENERGY) {
+      log(`Not enough energy to create ${creep.name}`)
+    };
 }
 
 function cleanUp() {
@@ -20,11 +87,8 @@ function cleanUp() {
 }
 
 export function loop(): void {
-    if (noCreeps()) {
-        createCreep();
-    } else {
-        cleanUp();
-    }
+    cleanUp();
+    respawnCreeps();
 
     for (const name in Game.creeps) {
         const creep = Game.creeps[name];

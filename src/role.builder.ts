@@ -30,13 +30,9 @@ const Builder: RoleBuilder = {
                 }
             }
         } else {
-            const sources = creep.room.find(FIND_SOURCES);
-            for (const source in sources) {
-                if (sources[source].id === '5bbcae009099fc012e638470') {
-                    if (creep.harvest(sources[source]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(sources[source], { visualizePathStyle: { stroke: '#ffaa00' } });
-                    }
-                }
+            const spawn = creep.room.find(FIND_MY_SPAWNS)[0];
+            if (creep.withdraw(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ffaa00' } });
             }
         }
     }

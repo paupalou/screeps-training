@@ -3,6 +3,7 @@
         "push": "tsc && grunt screeps"
     },
     "devDependencies": {
+        "@types/lodash": "^4.17.7",
         "@types/node": "^22.3.0",
         "@types/screeps": "^3.3.8",
         "grunt": "^1.6.1",

@@ -5,20 +5,13 @@ interface RoleHarvester {
 const Harvester: RoleHarvester = {
     run: function (creep) {
         if (creep.store.getFreeCapacity() > 0) {
-            const sources = creep.room.find(FIND_SOURCES);
-            if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#ffaa00' } });
+            const source = Game.getObjectById<Source>(creep.memory.sourceId);
+            if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
             }
         } else {
             const targets = creep.room.find(FIND_STRUCTURES, {
                 filter: structure => {
-                    console.log(structure.structureType);
-                    // console.log(structure.store);
-                    if (structure.structureType === STRUCTURE_SPAWN) {
-                        console.log(structure.store);
-                        console.log(structure.store.getFreeCapacity('energy'));
-                    }
-
                     return (
                         (structure.structureType == STRUCTURE_EXTENSION ||
                             structure.structureType == STRUCTURE_SPAWN) &&
