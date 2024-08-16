@@ -1,8 +1,18 @@
+import _ from 'lodash';
+
+const HARVESTER = 'harvester';
+
 interface RoleHarvester {
+    role: string;
+    count: () => number;
     run: (creep: Creep) => void;
 }
 
 const Harvester: RoleHarvester = {
+    role: HARVESTER,
+    count: function () {
+        return _.filter(Game.creeps, creep => creep.memory.role === HARVESTER).length;
+    },
     run: function (creep) {
         if (creep.store.getFreeCapacity() > 0) {
             const source = Game.getObjectById<Source>(creep.memory.sourceId);

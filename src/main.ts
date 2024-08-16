@@ -99,12 +99,12 @@ export function loop(): void {
 
     for (const name in Game.creeps) {
         const creep = Game.creeps[name];
-        if (name.startsWith('Harvester')) {
+        if (creep.memory.role === Harvester.role) {
             Harvester.run(creep);
             continue;
         }
 
-        if (name.startsWith('Builder')) {
+        if (Harvester.count() >= 4 && creep.memory.role === 'builder') {
             Builder.run(creep);
             continue;
         }
