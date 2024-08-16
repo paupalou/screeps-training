@@ -72,9 +72,16 @@ function createCreep(
         opts: { memory: { role: 'harvester' } }
     }
 ) {
-    if (Game.spawns[creep.spawn].spawnCreep(creep.actions, creep.name, creep.opts) === ERR_NOT_ENOUGH_ENERGY) {
-      log(`Not enough energy to create ${creep.name}`)
-    };
+    const result = Game.spawns[creep.spawn].spawnCreep(creep.actions, creep.name, creep.opts);
+    if (result === ERR_NOT_ENOUGH_ENERGY) {
+        log(`Not enough energy to create ${creep.name}`);
+    } else if (result === ERR_NAME_EXISTS) {
+        const duplicatedCreepNumber = Number(creep.name.slice(-1));
+        const nextCreepName = creep.name.slice(0, -1) + String(duplicatedCreepNumber + 1);
+        log(`Creep named ${creep.name} already exists, trying with ${nextCreepName}`);
+        const nextCreep = { ...creep, name: nextCreepName };
+        createCreep(nextCreep);
+    }
 }
 
 function cleanUp() {
