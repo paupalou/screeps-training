@@ -1,56 +1,62 @@
 import _ from 'lodash';
 
-const HARVESTER = 'harvester';
+import { BaseCreep, CreepRole } from './creep';
 
-interface RoleHarvester {
-    role: string;
-    count: () => number;
-    all: () => Creep[];
-    run: (creep: Creep) => void;
+function isFull(creep: Creep) {
+    return creep.store.getFreeCapacity() === 0;
 }
 
-const Harvester: RoleHarvester = {
-    role: HARVESTER,
-    all: function () {
-        return _.filter(Game.creeps, creep => creep.memory.role === HARVESTER);
-    },
-    count: function () {
-        return _.filter(Game.creeps, creep => creep.memory.role === HARVESTER).length;
-    },
+function harvest(creep: Creep) {
+    const source = Game.getObjectById<Source>(creep.memory.sourceId);
+    if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
+    }
+}
+
+function getSpawn(creep: Creep) {
+    return creep.room.find(FIND_STRUCTURES, {
+        filter: structure => structure.structureType == STRUCTURE_SPAWN
+    })[0];
+}
+
+function getSpawnExtensions(creep: Creep) {
+    return creep.room.find(FIND_STRUCTURES, {
+        filter: structure =>
+            structure.structureType == STRUCTURE_EXTENSION &&
+            structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
+    });
+}
+
+function transferTo(creep: Creep, target: Structure | null) {
+    if (!target) {
+        return;
+    }
+
+    const result = creep.transfer(target, RESOURCE_ENERGY);
+    if (result == ERR_NOT_IN_RANGE) {
+        creep.moveTo(target, { visualizePathStyle: { stroke: '#ffffff' } });
+    }
+    return result;
+}
+
+function withdrawResources(creep: Creep) {
+    const containers = creep.room.find(FIND_STRUCTURES, {
+        filter: structure =>
+            structure.structureType == STRUCTURE_CONTAINER &&
+            structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
+    });
+    const closest = creep.pos.findClosestByPath([getSpawn(creep), ...getSpawnExtensions(creep), ...containers]);
+    transferTo(creep, closest);
+}
+
+const Harvester: BaseCreep = {
+    role: CreepRole.HARVESTER,
     run: function (creep) {
-        if (creep.store.getFreeCapacity() > 0) {
-            const source = Game.getObjectById<Source>(creep.memory.sourceId);
-            if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
-            }
-        } else {
-            const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: structure =>
-                    structure.structureType == STRUCTURE_CONTAINER &&
-                    structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
-            });
-            if (container) {
-                if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
-                }
-            } else {
-                const extensions = creep.room.find(FIND_STRUCTURES, {
-                    filter: structure =>
-                        structure.structureType == STRUCTURE_EXTENSION &&
-                        structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
-                });
-                if (extensions.length > 0) {
-                    if (creep.transfer(extensions[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(extensions[0], { visualizePathStyle: { stroke: '#ffffff' } });
-                    }
-                } else {
-                    const base = creep.room.find(FIND_STRUCTURES, {
-                        filter: structure => structure.structureType == STRUCTURE_SPAWN
-                    })[0];
-                    creep.moveTo(base, { visualizePathStyle: { stroke: '#ffffff' } });
-                }
-            }
+        if (isFull(creep)) {
+            withdrawResources(creep);
+            return;
         }
+        harvest(creep);
     }
 };
 

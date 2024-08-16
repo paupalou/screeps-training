@@ -1,10 +1,9 @@
 import _ from 'lodash';
 
-interface RoleBuilder {
-    run: (creep: Creep) => void;
-}
+import { BaseCreep, CreepRole } from './creep';
 
-const Builder: RoleBuilder = {
+const Builder: BaseCreep = {
+    role: CreepRole.BUILDER,
     run: function (creep) {
         if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.building = false;
@@ -50,9 +49,8 @@ const Builder: RoleBuilder = {
                     creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
                 }
             } else {
-                console.log("no container");
                 const extensions = creep.room.find(FIND_STRUCTURES, {
-                  filter: structure => structure.structureType === STRUCTURE_EXTENSION
+                    filter: structure => structure.structureType === STRUCTURE_EXTENSION
                 });
 
                 // Then check extensions

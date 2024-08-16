@@ -1,8 +1,10 @@
 import _ from 'lodash';
 
-import Harvester from './role.harvester';
+import { count, CreepRole, getByRole } from './creep';
 import Builder from './role.builder';
+import Harvester from './role.harvester';
 import Upgrader from './role.upgrader';
+import Repairer from './role.repairer';
 
 enum RoomEnergySources {
     NORTH = '5bbcae009099fc012e63846e',
@@ -25,7 +27,8 @@ function respawnCreeps() {
     const creeps: Record<string, Creep[]> = {
         harvester: [],
         builder: [],
-        upgrader: []
+        upgrader: [],
+        repairer: [],
     };
 
     for (const name in Game.creeps) {
@@ -36,11 +39,11 @@ function respawnCreeps() {
     const harvesterCount = creeps.harvester.length;
     const builderCount = creeps.builder.length;
     const upgraderCount = creeps.upgrader.length;
+    const repairerCount = creeps.repairer.length;
 
     if (harvesterCount < 4) {
         const nextHarvesterNumber = harvesterCount + 1;
-        const harvesterTypes = _.groupBy(Harvester.all(), 'memory.sourceId');
-        log(harvesterTypes);
+        const harvesterTypes = _.groupBy(getByRole(CreepRole.HARVESTER), 'memory.sourceId');
 
         const harvester = {
             actions: [WORK, CARRY, MOVE],
@@ -79,7 +82,7 @@ function respawnCreeps() {
             name: 'Builder1',
             spawn: 'Spawn1',
             opts: {
-                memory: { role: 'builder' }
+                memory: { role: CreepRole.BUILDER }
             }
         };
         createCreep(builder);
@@ -91,7 +94,20 @@ function respawnCreeps() {
             name: 'Upgrader1',
             spawn: 'Spawn1',
             opts: {
-                memory: { role: 'upgrader' }
+                memory: { role: CreepRole.UPGRADER }
+            }
+        };
+        createCreep(upgrader);
+    }
+
+    if (repairerCount < 2) {
+        const nextRepairerNumber = repairerCount + 1;
+        const upgrader = {
+            actions: [WORK, CARRY, MOVE],
+            name: `Repairer${nextRepairerNumber}`,
+            spawn: 'Spawn1',
+            opts: {
+                memory: { role: CreepRole.REPAIRER }
             }
         };
         createCreep(upgrader);
@@ -133,18 +149,23 @@ export function loop(): void {
 
     for (const name in Game.creeps) {
         const creep = Game.creeps[name];
-        if (creep.memory.role === Harvester.role) {
+        if (creep.memory.role === CreepRole.HARVESTER) {
             Harvester.run(creep);
             continue;
         }
 
-        if (Upgrader.count() > 0 && Harvester.count() >= 4 && creep.memory.role === 'builder') {
+        if (count(CreepRole.UPGRADER) > 0 && creep.memory.role === CreepRole.BUILDER) {
             Builder.run(creep);
             continue;
         }
 
-        if (creep.memory.role === 'upgrader') {
+        if (creep.memory.role === CreepRole.UPGRADER) {
             Upgrader.run(creep);
+            continue;
+        }
+
+        if (creep.memory.role === CreepRole.REPAIRER) {
+            Repairer.run(creep);
             continue;
         }
     }

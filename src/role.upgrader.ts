@@ -1,26 +1,19 @@
 import _ from 'lodash';
 
-const BUILDER = 'builder';
+import { BaseCreep, CreepRole } from './creep';
 
-interface RoleUpgrader {
-    run: (creep: Creep) => void;
-    count: () => number;
-}
-
-const Upgrader: RoleUpgrader = {
-    count: function () {
-        return _.filter(Game.creeps, creep => creep.memory.role === BUILDER).length;
-    },
+const Upgrader: BaseCreep = {
+    role: CreepRole.UPGRADER,
     run: function (creep) {
         if (creep.store.energy === 0 || (!creep.memory.upgrading && creep.store.getFreeCapacity() > 0)) {
             creep.memory.upgrading = false;
-            const sources = creep.room.find(FIND_SOURCES);
-            for (const source in sources) {
-                if (sources[source].id === '5bbcae009099fc012e638470') {
-                    if (creep.harvest(sources[source]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(sources[source], { visualizePathStyle: { stroke: '#ffaa00' } });
-                    }
-                }
+            const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: structure =>
+                    structure.structureType == STRUCTURE_CONTAINER &&
+                    structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
+            });
+            if (container && creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
             }
         } else if (creep.room.controller) {
             creep.memory.upgrading = true;
