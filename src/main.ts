@@ -34,6 +34,7 @@ function respawnCreeps() {
     }
 
     const harvesterCount = creeps.harvester.length;
+    const builderCount = creeps.builder.length;
 
     if (harvesterCount < 4) {
         const nextHarvesterNumber = harvesterCount + 1;
@@ -51,7 +52,21 @@ function respawnCreeps() {
         createCreep(harvester);
     }
 
-    if (creeps.builder.length === 0) {
+    if (creeps.builder.length === 1) {
+        const nextBuilderNumber = builderCount + 1;
+        const builder = {
+            actions: [WORK, CARRY, MOVE],
+            name: `Builder${nextBuilderNumber}`,
+            spawn: 'Spawn1',
+            opts: {
+                memory: {
+                    role: 'builder',
+                    structureType: STRUCTURE_ROAD
+                }
+            }
+        };
+        createCreep(builder);
+    } else if (creeps.builder.length === 0) {
         const builder = {
             actions: [WORK, CARRY, MOVE],
             name: 'Builder1',
