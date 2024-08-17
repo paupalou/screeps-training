@@ -41,12 +41,12 @@ function respawnCreeps() {
     const upgraderCount = creeps.upgrader.length;
     const repairerCount = creeps.repairer.length;
 
-    if (harvesterCount < 5) {
+    if (harvesterCount < 4) {
         const nextHarvesterNumber = harvesterCount + 1;
         const harvesterTypes = _.groupBy(getByRole(CreepRole.HARVESTER), 'memory.sourceId');
 
         const harvester = {
-            actions: [WORK, WORK, CARRY, CARRY, MOVE],
+            actions: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
             name: `Harvester${nextHarvesterNumber}`,
             spawn: 'Spawn1',
             opts: {
@@ -62,10 +62,10 @@ function respawnCreeps() {
         createCreep(harvester);
     }
 
-    if (builderCount < 1) {
+    if (builderCount < 2) {
         const nextBuilderNumber = builderCount + 1;
         const builder = {
-            actions: [WORK, CARRY, MOVE],
+            actions: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
             name: `Builder${nextBuilderNumber}`,
             spawn: 'Spawn1',
             opts: {
