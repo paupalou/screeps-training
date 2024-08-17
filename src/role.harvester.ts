@@ -24,25 +24,31 @@ const Harvester: RoleHarvester = {
                 creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
             }
         } else {
-            const targets = creep.room.find(FIND_STRUCTURES, {
-                filter: structure => {
-                    return (
-                        (structure.structureType == STRUCTURE_CONTAINER ||
-                            structure.structureType == STRUCTURE_EXTENSION ||
-                            structure.structureType == STRUCTURE_SPAWN) &&
-                        structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
-                    );
-                }
+            const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: structure =>
+                    structure.structureType == STRUCTURE_CONTAINER &&
+                    structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
             });
-            if (targets.length > 0) {
-                if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ffffff' } });
+            if (container) {
+                if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
                 }
             } else {
-                const base = creep.room.find(FIND_STRUCTURES, {
-                    filter: structure => structure.structureType == STRUCTURE_SPAWN
-                })[0];
-                creep.moveTo(base, { visualizePathStyle: { stroke: '#ffffff' } });
+                const extensions = creep.room.find(FIND_STRUCTURES, {
+                    filter: structure =>
+                        structure.structureType == STRUCTURE_EXTENSION &&
+                        structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
+                });
+                if (extensions.length > 0) {
+                    if (creep.transfer(extensions[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(extensions[0], { visualizePathStyle: { stroke: '#ffffff' } });
+                    }
+                } else {
+                    const base = creep.room.find(FIND_STRUCTURES, {
+                        filter: structure => structure.structureType == STRUCTURE_SPAWN
+                    })[0];
+                    creep.moveTo(base, { visualizePathStyle: { stroke: '#ffffff' } });
+                }
             }
         }
     }

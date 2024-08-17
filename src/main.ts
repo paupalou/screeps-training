@@ -59,7 +59,7 @@ function respawnCreeps() {
         createCreep(harvester);
     }
 
-    if (builderCount === 1) {
+    if (builderCount < 4) {
         const nextBuilderNumber = builderCount + 1;
         const builder = {
             actions: [WORK, CARRY, MOVE],
