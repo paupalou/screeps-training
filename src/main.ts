@@ -5,7 +5,6 @@ import Builder from './role.builder';
 import Harvester from './role.harvester';
 import Upgrader from './role.upgrader';
 import Repairer from './role.repairer';
-import { log } from './utils';
 import Transporter from './role.transporter';
 
 function respawnCreeps() {
@@ -21,85 +20,11 @@ function respawnCreeps() {
         creeps[creep.memory.role] && creeps[creep.memory.role].push(creep);
     }
 
-    const builderCount = creeps.builder.length;
-    const upgraderCount = creeps.upgrader.length;
-    const repairerCount = creeps.repairer.length;
-
-    Harvester.spawn && Harvester.spawn();
-    Transporter.spawn && Transporter.spawn();
-
-    if (builderCount < 2) {
-        const nextBuilderNumber = builderCount + 1;
-        const builder = {
-            actions: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
-            name: `Builder${nextBuilderNumber}`,
-            spawn: 'Spawn1',
-            opts: {
-                memory: {
-                    role: CreepRole.BUILDER,
-                    structureType: STRUCTURE_ROAD
-                }
-            }
-        };
-        createCreep(builder);
-    }
-    // } else if (builderCount < 1) {
-    //     const builder = {
-    //         actions: [WORK, CARRY, MOVE],
-    //         name: 'Builder1',
-    //         spawn: 'Spawn1',
-    //         opts: {
-    //             memory: { role: CreepRole.BUILDER }
-    //         }
-    //     };
-    //     createCreep(builder);
-    // }
-
-    if (upgraderCount < 2) {
-        const nextUpgraderNumber = upgraderCount + 1;
-        const upgrader = {
-            actions: [WORK, WORK, WORK, WORK, CARRY, MOVE],
-            name: `Upgrader${nextUpgraderNumber}`,
-            spawn: 'Spawn1',
-            opts: {
-                memory: { role: CreepRole.UPGRADER }
-            }
-        };
-        createCreep(upgrader);
-    }
-
-    if (repairerCount < 2) {
-        const nextRepairerNumber = repairerCount + 1;
-        const upgrader = {
-            actions: [WORK, CARRY, MOVE],
-            name: `Repairer${nextRepairerNumber}`,
-            spawn: 'Spawn1',
-            opts: {
-                memory: { role: CreepRole.REPAIRER }
-            }
-        };
-        createCreep(upgrader);
-    }
-}
-
-function createCreep(
-    creep = {
-        actions: [WORK, CARRY, MOVE],
-        name: 'Harvester1',
-        spawn: 'Spawn1',
-        opts: { memory: { role: CreepRole.HARVESTER } }
-    }
-) {
-    const result = Game.spawns[creep.spawn].spawnCreep(creep.actions, creep.name, creep.opts);
-    if (result === ERR_NOT_ENOUGH_ENERGY) {
-        log(`Not enough energy to create ${creep.name}`);
-    } else if (result === ERR_NAME_EXISTS) {
-        const duplicatedCreepNumber = Number(creep.name.slice(-1));
-        const nextCreepName = creep.name.slice(0, -1) + String(duplicatedCreepNumber + 1);
-        log(`Creep named ${creep.name} already exists, trying with ${nextCreepName}`);
-        const nextCreep = { ...creep, name: nextCreepName };
-        createCreep(nextCreep);
-    }
+    Harvester.spawn();
+    Transporter.spawn();
+    Upgrader.spawn();
+    Builder.spawn();
+    Repairer.spawn();
 }
 
 function cleanUp() {

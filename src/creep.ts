@@ -12,7 +12,7 @@ export enum CreepRole {
 
 export interface BaseCreep {
     role: CreepRole;
-    spawn?: VoidFunction;
+    spawn: VoidFunction;
     run: (creep: Creep) => void;
 }
 
@@ -52,11 +52,12 @@ function get(creep: Creep) {
         });
     }
 
-    function spawnExtensions() {
-        return creep.room.find<StructureExtension>(FIND_STRUCTURES, {
-            filter: structure =>
-                structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-        });
+    function spawnExtensions(
+        filterOptions: FilterOptions<FIND_STRUCTURES, StructureExtension> | undefined = {
+            filter: structure => structure.structureType == STRUCTURE_EXTENSION
+        }
+    ) {
+        return creep.room.find<StructureExtension>(FIND_STRUCTURES, filterOptions);
     }
 
     return {

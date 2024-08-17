@@ -52,12 +52,12 @@ const Transporter: BaseCreep = {
         Creeps.create(harvester);
     },
     run: function (creep) {
-        if (creep.memory.transporting && creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-            creep.memory.transporting = false;
+        if (!creep.memory.transporting && creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+            creep.memory.transporting = true;
         }
 
-        if (!creep.memory.transporting && creep.store.getFreeCapacity() == 0) {
-            creep.memory.transporting = true;
+        if (creep.memory.transporting && creep.store.energy == 0) {
+            creep.memory.transporting = false;
         }
 
         if (creep.memory.transporting) {

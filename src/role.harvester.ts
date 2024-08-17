@@ -14,17 +14,30 @@ function harvest(creep: Creep) {
     }
 }
 
-function withdrawResources(creep: Creep) {
-    const containers = creep.room.find<StructureContainer>(FIND_STRUCTURES, {
-        filter: structure =>
-            structure.structureType == STRUCTURE_CONTAINER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    });
+function transfer(creep: Creep) {
+    let containers: StructureContainer[] = [];
+    const spawn = Creeps.get(creep).spawn();
+    const extensions = Creeps.get(creep).spawnExtensions();
+    const spawnMoney =
+        (spawn[0] ?? { store: { energy: 0 } }).store.energy +
+        extensions.reduce((acc, curr) => acc + curr.store.energy, 0);
+
+    if (spawnMoney >= 400) {
+        containers = creep.room.find<StructureContainer>(FIND_STRUCTURES, {
+            filter: structure =>
+                structure.structureType == STRUCTURE_CONTAINER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+        });
+    }
+
+    const extensionsFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
+        filter: (structure: AnyStructure) =>
+            structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+    };
     const closest = creep.pos.findClosestByPath([
-        ...Creeps.get(creep).spawn(),
-        ...Creeps.get(creep).spawnExtensions(),
+        ...spawn,
+        ...Creeps.get(creep).spawnExtensions(extensionsFilter),
         ...containers
     ]);
-    // const closest = creep.pos.findClosestByPath([...getSpawn(creep), ...getSpawnExtensions(creep)]);
     Creeps.transfer(creep).to(closest);
 }
 
@@ -39,7 +52,7 @@ const Harvester: BaseCreep = {
 
         const harvester = {
             // actions: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
-            actions: [WORK, CARRY, CARRY, MOVE, MOVE],
+            actions: [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
             name: `Harvester${harvesterCount + 1}`,
             spawn: 'Spawn1',
             opts: {
@@ -65,7 +78,7 @@ const Harvester: BaseCreep = {
         }
 
         if (creep.memory.transfering) {
-            withdrawResources(creep);
+            transfer(creep);
         } else {
             harvest(creep);
         }

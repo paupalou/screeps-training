@@ -1,9 +1,26 @@
 import _ from 'lodash';
 
-import { BaseCreep, CreepRole } from './creep';
+import Creeps, { BaseCreep, CreepRole } from './creep';
 
 const Builder: BaseCreep = {
     role: CreepRole.BUILDER,
+    spawn: function () {
+        const builderCount = Creeps.count(CreepRole.BUILDER);
+        if (builderCount >= 1) {
+            return;
+        }
+        const builder = {
+            actions: [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+            name: `Builder${builderCount + 1}`,
+            spawn: 'Spawn1',
+            opts: {
+                memory: {
+                    role: CreepRole.BUILDER
+                }
+            }
+        };
+        Creeps.create(builder);
+    },
     run: function (creep) {
         if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.building = false;

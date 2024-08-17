@@ -1,9 +1,27 @@
 import _ from 'lodash';
 
-import { BaseCreep, CreepRole } from './creep';
+import Creeps, { BaseCreep, CreepRole } from './creep';
 
 const Repairer: BaseCreep = {
     role: CreepRole.REPAIRER,
+    spawn: function () {
+        const repairerCount = Creeps.count(CreepRole.REPAIRER);
+        if (repairerCount >= 1) {
+            return;
+        }
+
+        const repairer = {
+            actions: [WORK, CARRY, MOVE],
+            name: `Repairer${repairerCount + 1}`,
+            spawn: 'Spawn1',
+            opts: {
+                memory: {
+                    role: CreepRole.REPAIRER
+                }
+            }
+        };
+        Creeps.create(repairer);
+    },
     run: function (creep) {
         if (creep.store.energy === 0 || (!creep.memory.reparing && creep.store.getFreeCapacity() > 0)) {
             creep.memory.reparing = false;

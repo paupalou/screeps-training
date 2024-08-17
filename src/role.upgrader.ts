@@ -1,9 +1,26 @@
 import _ from 'lodash';
 
-import { BaseCreep, CreepRole } from './creep';
+import Creeps, { BaseCreep, CreepRole } from './creep';
 
 const Upgrader: BaseCreep = {
     role: CreepRole.UPGRADER,
+    spawn: () => {
+        const upgraderCount = Creeps.count(CreepRole.UPGRADER);
+        if (upgraderCount >= 1) {
+            return;
+        }
+
+        const nextUpgraderNumber = upgraderCount + 1;
+        const upgrader = {
+            actions: [WORK, WORK, WORK, WORK, CARRY, MOVE],
+            name: `Upgrader${nextUpgraderNumber}`,
+            spawn: 'Spawn1',
+            opts: {
+                memory: { role: CreepRole.UPGRADER }
+            }
+        };
+        Creeps.create(upgrader);
+    },
     run: function (creep) {
         if (creep.store.energy === 0 || (!creep.memory.upgrading && creep.store.getFreeCapacity() > 0)) {
             creep.memory.upgrading = false;
