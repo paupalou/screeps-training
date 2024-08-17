@@ -33,6 +33,7 @@ function respawnCreeps() {
 
     for (const name in Game.creeps) {
         const creep = Game.creeps[name];
+        log(Object.keys(creeps));
         creeps[creep.memory.role] && creeps[creep.memory.role].push(creep);
     }
 
@@ -51,7 +52,7 @@ function respawnCreeps() {
             spawn: 'Spawn1',
             opts: {
                 memory: {
-                    role: 'harvester',
+                    role: CreepRole.HARVESTER,
                     sourceId:
                         harvesterTypes[RoomEnergySources.SOUTH].length > harvesterTypes[RoomEnergySources.NORTH].length
                             ? RoomEnergySources.NORTH
@@ -70,7 +71,7 @@ function respawnCreeps() {
             spawn: 'Spawn1',
             opts: {
                 memory: {
-                    role: 'builder',
+                    role: CreepRole.BUILDER,
                     structureType: STRUCTURE_ROAD
                 }
             }
@@ -121,7 +122,7 @@ function createCreep(
         actions: [WORK, CARRY, MOVE],
         name: 'Harvester1',
         spawn: 'Spawn1',
-        opts: { memory: { role: 'harvester' } }
+        opts: { memory: { role: CreepRole.HARVESTER } }
     }
 ) {
     const result = Game.spawns[creep.spawn].spawnCreep(creep.actions, creep.name, creep.opts);
