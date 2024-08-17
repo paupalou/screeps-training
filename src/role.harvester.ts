@@ -1,7 +1,6 @@
 import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
-import { log } from './utils';
 
 enum RoomEnergySources {
     NORTH = '5bbcae009099fc012e63846e',
@@ -52,7 +51,7 @@ const Harvester: BaseCreep = {
         const harvesterTypes = _.groupBy(Creeps.getByRole(CreepRole.HARVESTER), 'memory.sourceId');
 
         const harvester = {
-            actions: [WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+            actions: [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
             name: `Harvester${harvesterCount + 1}`,
             spawn: 'Spawn1',
             opts: {

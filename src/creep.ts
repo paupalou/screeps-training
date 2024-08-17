@@ -25,7 +25,7 @@ function count(role: CreepRole) {
 }
 
 function transfer(creep: Creep) {
-    function to(target: StructureContainer | StructureSpawn | StructureExtension | null) {
+    function to(target: StructureContainer | StructureSpawn | StructureExtension | StructureTower | null) {
         if (!target) {
             return;
         }
@@ -60,7 +60,16 @@ function get(creep: Creep) {
         return creep.room.find<StructureExtension>(FIND_STRUCTURES, filterOptions);
     }
 
+    function towers(
+        filterOptions: FilterOptions<FIND_STRUCTURES, StructureTower> | undefined = {
+            filter: structure => structure.structureType == STRUCTURE_TOWER
+        }
+    ) {
+        return creep.room.find(FIND_STRUCTURES, filterOptions);
+    }
+
     return {
+        towers,
         spawn,
         spawnExtensions
     };

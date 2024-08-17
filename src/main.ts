@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import Creeps, { CreepRole } from './creep';
+import Towers from './structure.tower';
 import Builder from './role.builder';
 import Harvester from './role.harvester';
 import Upgrader from './role.upgrader';
@@ -19,6 +20,7 @@ function respawnCreeps() {
         const creep = Game.creeps[name];
         creeps[creep.memory.role] && creeps[creep.memory.role].push(creep);
     }
+
 
     Harvester.spawn();
     Transporter.spawn();
@@ -39,6 +41,8 @@ function cleanUp() {
 export function loop(): void {
     cleanUp();
     respawnCreeps();
+
+    Towers.run(Game.rooms["E18S28"]);
 
     for (const name in Game.creeps) {
         const creep = Game.creeps[name];

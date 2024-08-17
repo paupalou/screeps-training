@@ -2,11 +2,13 @@ import _ from 'lodash';
 
 import Creeps, { BaseCreep, CreepRole } from './creep';
 
+const BUILDERS = 1;
+
 const Builder: BaseCreep = {
     role: CreepRole.BUILDER,
     spawn: function () {
         const builderCount = Creeps.count(CreepRole.BUILDER);
-        if (builderCount >= 1) {
+        if (builderCount >= BUILDERS) {
             return;
         }
         const builder = {
@@ -47,12 +49,8 @@ const Builder: BaseCreep = {
                     creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ffffff' } });
                 }
             } else {
-                const roads = creep.room.find(FIND_CONSTRUCTION_SITES);
-                if (roads.length) {
-                    if (creep.build(roads[0]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(roads[0], { visualizePathStyle: { stroke: '#ffffff' } });
-                    }
-                }
+                // if there is nothing to build then conver to repairer
+                creep.memory.role = 'repairer';
             }
         } else {
             // Check closest containers first

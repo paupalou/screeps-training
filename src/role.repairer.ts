@@ -2,11 +2,13 @@ import _ from 'lodash';
 
 import Creeps, { BaseCreep, CreepRole } from './creep';
 
+const REPAIRERS = 1;
+
 const Repairer: BaseCreep = {
     role: CreepRole.REPAIRER,
     spawn: function () {
         const repairerCount = Creeps.count(CreepRole.REPAIRER);
-        if (repairerCount >= 1) {
+        if (repairerCount >= REPAIRERS) {
             return;
         }
 

@@ -2,10 +2,7 @@ import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 
-// enum RoomEnergySources {
-//     NORTH = '5bbcae009099fc012e63846e',
-//     SOUTH = '5bbcae009099fc012e638470'
-// }
+const TRANSPORTERS = 1;
 
 function almostFullContainer(creep: Creep) {
     return creep.pos.findClosestByPath<StructureContainer>(FIND_STRUCTURES, {
@@ -31,7 +28,14 @@ function storeResources(creep: Creep) {
         filter: (structure: AnyStructure) =>
             structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     };
+
+    const towersFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
+        filter: (structure: AnyStructure) =>
+            structure.structureType == STRUCTURE_TOWER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+    };
+
     const closest = creep.pos.findClosestByPath([
+        ...Creeps.get(creep).towers(towersFilter),
         ...Creeps.get(creep).spawn(),
         ...Creeps.get(creep).spawnExtensions(extensionsFilter)
     ]);
@@ -43,11 +47,11 @@ const Transporter: BaseCreep = {
     role: CreepRole.TRANSPORTER,
     spawn: function () {
         const transporterCount = Creeps.count(CreepRole.TRANSPORTER);
-        if (transporterCount >= 1) {
+        if (transporterCount >= TRANSPORTERS) {
             return;
         }
         const harvester = {
-            actions: [CARRY, CARRY, MOVE, MOVE],
+            actions: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
             name: `Transporter${transporterCount + 1}`,
             spawn: 'Spawn1',
             opts: {

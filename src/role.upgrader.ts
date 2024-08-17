@@ -2,17 +2,19 @@ import _ from 'lodash';
 
 import Creeps, { BaseCreep, CreepRole } from './creep';
 
+const UPGRADERS = 3;
+
 const Upgrader: BaseCreep = {
     role: CreepRole.UPGRADER,
     spawn: () => {
         const upgraderCount = Creeps.count(CreepRole.UPGRADER);
-        if (upgraderCount >= 2) {
+        if (upgraderCount >= UPGRADERS) {
             return;
         }
 
         const nextUpgraderNumber = upgraderCount + 1;
         const upgrader = {
-            actions: [WORK, WORK, WORK, WORK, CARRY, MOVE],
+            actions: [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE],
             name: `Upgrader${nextUpgraderNumber}`,
             spawn: 'Spawn1',
             opts: {
@@ -27,7 +29,7 @@ const Upgrader: BaseCreep = {
             const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: structure =>
                     structure.structureType == STRUCTURE_CONTAINER &&
-                    structure.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.energy
+                    structure.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)
             });
             if (container && creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
