@@ -41,12 +41,11 @@ function respawnCreeps() {
     const upgraderCount = creeps.upgrader.length;
     const repairerCount = creeps.repairer.length;
 
-    if (harvesterCount < 4) {
+    if (harvesterCount < 5) {
         const nextHarvesterNumber = harvesterCount + 1;
         const harvesterTypes = _.groupBy(getByRole(CreepRole.HARVESTER), 'memory.sourceId');
 
         const harvester = {
-            // actions: [WORK, CARRY, MOVE],
             actions: [WORK, WORK, CARRY, CARRY, MOVE],
             name: `Harvester${nextHarvesterNumber}`,
             spawn: 'Spawn1',
@@ -63,7 +62,7 @@ function respawnCreeps() {
         createCreep(harvester);
     }
 
-    if (builderCount < 4) {
+    if (builderCount < 1) {
         const nextBuilderNumber = builderCount + 1;
         const builder = {
             actions: [WORK, CARRY, MOVE],
@@ -77,22 +76,24 @@ function respawnCreeps() {
             }
         };
         createCreep(builder);
-    } else if (builderCount < 1) {
-        const builder = {
-            actions: [WORK, CARRY, MOVE],
-            name: 'Builder1',
-            spawn: 'Spawn1',
-            opts: {
-                memory: { role: CreepRole.BUILDER }
-            }
-        };
-        createCreep(builder);
     }
+    // } else if (builderCount < 1) {
+    //     const builder = {
+    //         actions: [WORK, CARRY, MOVE],
+    //         name: 'Builder1',
+    //         spawn: 'Spawn1',
+    //         opts: {
+    //             memory: { role: CreepRole.BUILDER }
+    //         }
+    //     };
+    //     createCreep(builder);
+    // }
 
-    if (upgraderCount < 1) {
+    if (upgraderCount < 2) {
+        const nextUpgraderNumber = harvesterCount + 1;
         const upgrader = {
-            actions: [WORK, CARRY, MOVE],
-            name: 'Upgrader1',
+            actions: [WORK, WORK, WORK, WORK, CARRY, MOVE],
+            name: `Upgrader${nextUpgraderNumber}`,
             spawn: 'Spawn1',
             opts: {
                 memory: { role: CreepRole.UPGRADER }
