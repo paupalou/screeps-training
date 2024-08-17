@@ -6,7 +6,7 @@ const Upgrader: BaseCreep = {
     role: CreepRole.UPGRADER,
     spawn: () => {
         const upgraderCount = Creeps.count(CreepRole.UPGRADER);
-        if (upgraderCount >= 1) {
+        if (upgraderCount >= 2) {
             return;
         }
 

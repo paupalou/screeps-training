@@ -27,7 +27,14 @@ function withdrawResources(creep: Creep, target: StructureContainer | null) {
 }
 
 function storeResources(creep: Creep) {
-    const closest = creep.pos.findClosestByPath([...Creeps.get(creep).spawn(), ...Creeps.get(creep).spawnExtensions()]);
+    const extensionsFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
+        filter: (structure: AnyStructure) =>
+            structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+    };
+    const closest = creep.pos.findClosestByPath([
+        ...Creeps.get(creep).spawn(),
+        ...Creeps.get(creep).spawnExtensions(extensionsFilter)
+    ]);
 
     Creeps.transfer(creep).to(closest);
 }
@@ -52,7 +59,7 @@ const Transporter: BaseCreep = {
         Creeps.create(harvester);
     },
     run: function (creep) {
-        if (!creep.memory.transporting && creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+        if (!creep.memory.transporting && creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
             creep.memory.transporting = true;
         }
 
