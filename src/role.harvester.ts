@@ -51,7 +51,7 @@ const Harvester: BaseCreep = {
         const harvesterTypes = _.groupBy(Creeps.getByRole(CreepRole.HARVESTER), 'memory.sourceId');
 
         const harvester = {
-            actions: [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+            actions: [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
             name: `Harvester${harvesterCount + 1}`,
             spawn: 'Spawn1',
             opts: {

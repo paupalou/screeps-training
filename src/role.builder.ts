@@ -4,11 +4,15 @@ import Creeps, { BaseCreep, CreepRole } from './creep';
 
 const BUILDERS = 1;
 
+function somethingToBuild() {
+    return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES).length > 0;
+}
+
 const Builder: BaseCreep = {
     role: CreepRole.BUILDER,
     spawn: function () {
         const builderCount = Creeps.count(CreepRole.BUILDER);
-        if (builderCount >= BUILDERS) {
+        if (somethingToBuild() && builderCount >= BUILDERS) {
             return;
         }
         const builder = {
