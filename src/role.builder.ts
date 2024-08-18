@@ -3,17 +3,17 @@ import _ from 'lodash';
 import Creeps, { BaseCreep, CreepRole } from './creep';
 import { log } from './utils';
 
-const BUILDERS = 1;
+const BUILDERS = 0;
 
-function somethingToBuild() {
-    return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES);
+function nothingToBuild() {
+    return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES).length == 0;
 }
 
 const Builder: BaseCreep = {
     role: CreepRole.BUILDER,
     spawn: function () {
         const builderCount = Creeps.count(CreepRole.BUILDER);
-        if (somethingToBuild() && builderCount >= BUILDERS) {
+        if (nothingToBuild() || builderCount >= BUILDERS) {
             return;
         }
         const builder = {

@@ -7,7 +7,7 @@ const TRANSPORTERS = 1;
 function almostFullContainer(creep: Creep) {
     return creep.pos.findClosestByPath<StructureContainer>(FIND_STRUCTURES, {
         filter: structure =>
-            structure.structureType == STRUCTURE_CONTAINER && structure.store.getFreeCapacity(RESOURCE_ENERGY) < 500
+            structure.structureType == STRUCTURE_CONTAINER && structure.store.getFreeCapacity(RESOURCE_ENERGY) < 1500
     });
 }
 

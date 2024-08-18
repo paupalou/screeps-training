@@ -75,7 +75,7 @@ function get(creep: Creep) {
     }
 
     return {
-      constructionSites,
+        constructionSites,
         towers,
         spawn,
         spawnExtensions,
