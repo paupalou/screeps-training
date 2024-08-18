@@ -1,11 +1,12 @@
 import _ from 'lodash';
 
 import Creeps, { BaseCreep, CreepRole } from './creep';
+import { log } from './utils';
 
 const BUILDERS = 1;
 
 function somethingToBuild() {
-    return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES).length > 0;
+    return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES);
 }
 
 const Builder: BaseCreep = {
@@ -38,8 +39,8 @@ const Builder: BaseCreep = {
         }
 
         if (creep.memory.building) {
-            const constructionSites = Creeps.get(creep).structure<ConstructionSite[]>();
-            if (constructionSites.length) {
+            const constructionSites = Creeps.get(creep).constructionSites();
+            if (constructionSites && constructionSites.length) {
                 if (creep.build(constructionSites[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(constructionSites[0], { visualizePathStyle: { stroke: '#ffffff' } });
                 }
@@ -59,7 +60,8 @@ const Builder: BaseCreep = {
                     creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
                 }
             } else {
-                const extensions = Creeps.get(creep).structure<StructureExtension[]>();
+                // const extensions = Creeps.get(creep).structure<StructureExtension[]>();
+                const extensions = Creeps.get(creep).spawnExtensions();
 
                 // Then check extensions
                 const extWithEnergy = _.findIndex(
@@ -72,10 +74,10 @@ const Builder: BaseCreep = {
                     }
                 } else {
                     // Then withdraw from SPAWN at the end
-                    const spawn = Creeps.get(creep).spawn()[0];
-                    if (spawn.store.energy >= creep.store.getCapacity(RESOURCE_ENERGY)) {
-                        if (creep.withdraw(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ffaa00' } });
+                    const spawn = Creeps.get(creep).spawn();
+                    if (spawn.length && spawn[0].store.energy >= creep.store.getCapacity(RESOURCE_ENERGY)) {
+                        if (creep.withdraw(spawn[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(spawn[0], { visualizePathStyle: { stroke: '#ffaa00' } });
                         }
                     }
                 }

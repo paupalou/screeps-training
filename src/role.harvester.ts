@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
+import { log } from './utils';
 
 enum RoomEnergySources {
     NORTH = '5bbcae009099fc012e63846e',
@@ -24,7 +25,9 @@ function transfer(creep: Creep) {
         (spawn[0] ?? { store: { energy: 0 } }).store.energy +
         extensions.reduce((acc, curr) => acc + curr.store.energy, 0);
 
-    if (spawnMoney >= 700) {
+    log(`spawnMoney ${spawnMoney}`);
+    if ((spawn.length === 0 && spawnMoney >=400) || spawnMoney >= 700) {
+        log(`returning to containers`);
         containers = creep.room.find<StructureContainer>(FIND_STRUCTURES, {
             filter: structure =>
                 structure.structureType == STRUCTURE_CONTAINER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
