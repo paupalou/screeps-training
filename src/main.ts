@@ -3,7 +3,7 @@ import _ from 'lodash';
 import Creeps, { CreepRole } from './creep';
 import Towers from './structure.tower';
 import Builder from './role.builder';
-import Harvester from './role.harvester';
+import Harvester, { HARVESTERS } from './role.harvester';
 import Upgrader from './role.upgrader';
 import Repairer from './role.repairer';
 import Transporter from './role.transporter';
@@ -23,6 +23,11 @@ function respawnCreeps() {
 
 
     Harvester.spawn();
+    if (Creeps.count(CreepRole.HARVESTER) < HARVESTERS) {
+      // do not create any other creep if we dont have expected harvesters alive
+      return;
+    }
+
     Transporter.spawn();
     Upgrader.spawn();
     Builder.spawn();

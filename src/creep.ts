@@ -45,6 +45,9 @@ function transfer(creep: Creep) {
 }
 
 function get(creep: Creep) {
+    function structure<T>(filterOptions?: FilterOptions<FIND_STRUCTURES>) {
+        return creep.room.find(FIND_STRUCTURES, filterOptions) as T;
+    }
     function spawn() {
         return creep.room.find<StructureSpawn>(FIND_STRUCTURES, {
             filter: structure =>
@@ -71,7 +74,8 @@ function get(creep: Creep) {
     return {
         towers,
         spawn,
-        spawnExtensions
+        spawnExtensions,
+        structure
     };
 }
 

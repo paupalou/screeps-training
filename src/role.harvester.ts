@@ -7,6 +7,8 @@ enum RoomEnergySources {
     SOUTH = '5bbcae009099fc012e638470'
 }
 
+export const HARVESTERS = 4;
+
 function harvest(creep: Creep) {
     const source = Game.getObjectById<Source>(creep.memory.sourceId);
     if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
@@ -45,7 +47,7 @@ const Harvester: BaseCreep = {
     role: CreepRole.HARVESTER,
     spawn: function () {
         const harvesterCount = Creeps.count(CreepRole.HARVESTER);
-        if (harvesterCount >= 4) {
+        if (harvesterCount >= HARVESTERS) {
             return;
         }
         const harvesterTypes = _.groupBy(Creeps.getByRole(CreepRole.HARVESTER), 'memory.sourceId');
