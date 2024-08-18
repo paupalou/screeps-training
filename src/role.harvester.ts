@@ -24,7 +24,7 @@ function transfer(creep: Creep) {
         (spawn[0] ?? { store: { energy: 0 } }).store.energy +
         extensions.reduce((acc, curr) => acc + curr.store.energy, 0);
 
-    if (spawnMoney >= 400) {
+    if (spawnMoney >= 700) {
         containers = creep.room.find<StructureContainer>(FIND_STRUCTURES, {
             filter: structure =>
                 structure.structureType == STRUCTURE_CONTAINER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
