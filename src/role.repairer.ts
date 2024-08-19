@@ -37,13 +37,14 @@ const Repairer: BaseCreep = {
             }
         } else {
             creep.memory.reparing = true;
-            const nonRoadStructures = creep.room.find(FIND_STRUCTURES, {
-                filter: structure => structure.structureType !== STRUCTURE_ROAD && structure.hits < structure.hitsMax
+            const nonWallOrRoadStructures = creep.room.find(FIND_STRUCTURES, {
+                filter: structure => structure.structureType !== STRUCTURE_WALL &&
+                  structure.structureType !== STRUCTURE_ROAD && structure.hits < structure.hitsMax
             });
 
-            if (nonRoadStructures.length > 0) {
-                if (creep.repair(nonRoadStructures[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(nonRoadStructures[0], { visualizePathStyle: { stroke: '#ffaa00' } });
+            if (nonWallOrRoadStructures.length > 0) {
+                if (creep.repair(nonWallOrRoadStructures[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(nonWallOrRoadStructures[0], { visualizePathStyle: { stroke: '#ffaa00' } });
                 }
             } else {
                 const damagedStructures = creep.room.find(FIND_STRUCTURES, {

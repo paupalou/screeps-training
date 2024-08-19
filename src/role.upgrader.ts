@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import Creeps, { BaseCreep, CreepRole } from './creep';
 
-const UPGRADERS = 3;
+const UPGRADERS = 2;
 
 const Upgrader: BaseCreep = {
     role: CreepRole.UPGRADER,
