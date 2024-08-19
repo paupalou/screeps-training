@@ -6,21 +6,15 @@ import Builder from './role.builder';
 import Harvester, { HARVESTERS } from './role.harvester';
 import Upgrader from './role.upgrader';
 import Repairer from './role.repairer';
-import Transporter from './role.transporter';
+import Transporter, { TRANSPORTERS } from './role.transporter';
+import Stealer from './role.stealer';
 
 function respawnCreeps() {
-    const creeps: Record<string, Creep[]> = {
-        harvester: [],
-        builder: [],
-        upgrader: [],
-        repairer: []
-    };
-
-    for (const name in Game.creeps) {
-        const creep = Game.creeps[name];
-        creeps[creep.memory.role] && creeps[creep.memory.role].push(creep);
+    Transporter.spawn();
+    if (Creeps.count(CreepRole.TRANSPORTER) < TRANSPORTERS) {
+      // do not create any other creep if we dont have expected transporter alive
+      return;
     }
-
 
     Harvester.spawn();
     if (Creeps.count(CreepRole.HARVESTER) < HARVESTERS) {
@@ -28,10 +22,10 @@ function respawnCreeps() {
       return;
     }
 
-    Transporter.spawn();
     Upgrader.spawn();
     Builder.spawn();
     Repairer.spawn();
+    Stealer.spawn();
 }
 
 function cleanUp() {
@@ -56,7 +50,7 @@ export function loop(): void {
             continue;
         }
 
-        if (Creeps.count(CreepRole.UPGRADER) > 0 && creep.memory.role === CreepRole.BUILDER) {
+        if (creep.memory.role === CreepRole.BUILDER) {
             Builder.run(creep);
             continue;
         }
@@ -73,6 +67,11 @@ export function loop(): void {
 
         if (creep.memory.role === CreepRole.TRANSPORTER) {
             Transporter.run(creep);
+            continue;
+        }
+
+        if (creep.memory.role === CreepRole.STEALER) {
+            Stealer.run(creep);
             continue;
         }
     }

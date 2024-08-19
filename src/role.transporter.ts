@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 
-const TRANSPORTERS = 1;
+export const TRANSPORTERS = 1;
 
 function almostFullContainer(creep: Creep) {
     return creep.pos.findClosestByPath<StructureContainer>(FIND_STRUCTURES, {
@@ -12,6 +12,14 @@ function almostFullContainer(creep: Creep) {
 }
 
 function withdrawResources(creep: Creep, target: StructureContainer | null) {
+    const droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
+    if (droppedEnergy) {
+        if (creep.pickup(droppedEnergy) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(droppedEnergy, { visualizePathStyle: { stroke: '#ffffff' } });
+        }
+        return;
+    }
+
     if (!target) {
         return;
     }
@@ -29,18 +37,22 @@ function storeResources(creep: Creep) {
             structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
     };
 
-    const towersFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
-        filter: (structure: AnyStructure) =>
-            structure.structureType == STRUCTURE_TOWER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    };
-
-    const closest = creep.pos.findClosestByPath([
-        ...Creeps.get(creep).towers(towersFilter),
+    const closestNonTower = creep.pos.findClosestByPath([
         ...Creeps.get(creep).spawn(),
         ...Creeps.get(creep).spawnExtensions(extensionsFilter)
     ]);
 
-    Creeps.transfer(creep).to(closest);
+    if (closestNonTower) {
+        Creeps.transfer(creep).to(closestNonTower);
+    } else {
+        const towersFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
+            filter: (structure: AnyStructure) =>
+                structure.structureType == STRUCTURE_TOWER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+        };
+        const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
+
+        closestTower && Creeps.transfer(creep).to(closestTower);
+    }
 }
 
 const Transporter: BaseCreep = {

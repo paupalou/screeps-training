@@ -7,7 +7,8 @@ export enum CreepRole {
     BUILDER = 'builder',
     UPGRADER = 'upgrader',
     REPAIRER = 'repairer',
-    TRANSPORTER = 'transporter'
+    TRANSPORTER = 'transporter',
+    STEALER = 'stealer'
 }
 
 export interface BaseCreep {

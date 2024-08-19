@@ -1,27 +1,44 @@
 import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
+import { log } from './utils';
 
 enum RoomEnergySources {
-    NORTH = '5bbcae009099fc012e63846e',
-    SOUTH = '5bbcae009099fc012e638470'
+    WEST = '5bbcadf29099fc012e6382e9'
 }
 
-export const HARVESTERS = 4;
+const MAIN_ROOM = 'E18S28';
+const MAIN_ROOM_EXIT = [0, 27];
+const TARGET_ROOM = 'E17S28';
+const TARGET_ROOM_EXIT = [49, 27];
+
+export const STEALERS = 0;
 
 function harvest(creep: Creep) {
+    if (creep.room == Game.rooms[MAIN_ROOM]) {
+        const [x, y] = MAIN_ROOM_EXIT;
+        creep.moveTo(x, y, { visualizePathStyle: { stroke: '#ffffff' } });
+        return;
+    }
+
     const source = Game.getObjectById<Source>(creep.memory.sourceId);
-    if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
+    if (!source) {
+        return;
+    }
+
+    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
         creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
     }
 }
 
 function transfer(creep: Creep) {
-    let containers: StructureContainer[] = [];
+    if (creep.room != Game.rooms[MAIN_ROOM]) {
+        const [x, y] = TARGET_ROOM_EXIT;
+        creep.moveTo(x, y, { visualizePathStyle: { stroke: '#ffffff' } });
+        return;
+    }
 
-    // const towers = creep.room.find(FIND_STRUCTURES, { filter: struc => struc.structureType === STRUCTURE_TOWER });
-    // Creeps.transfer(creep).to(towers[0]);
-    // return;
+    let containers: StructureContainer[] = [];
 
     const spawn = Creeps.get(creep).spawn();
     const extensions = Creeps.get(creep).spawnExtensions();
@@ -48,32 +65,26 @@ function transfer(creep: Creep) {
     Creeps.transfer(creep).to(closest);
 }
 
-const Harvester: BaseCreep = {
-    role: CreepRole.HARVESTER,
+const Stealer: BaseCreep = {
+    role: CreepRole.STEALER,
     spawn: function () {
-        const harvesterCount = Creeps.count(CreepRole.HARVESTER);
-        if (harvesterCount >= HARVESTERS) {
+        const stealersCount = Creeps.count(CreepRole.STEALER);
+        if (stealersCount >= STEALERS) {
             return;
         }
-        const harvesterTypes = _.groupBy(Creeps.getByRole(CreepRole.HARVESTER), 'memory.sourceId');
 
-        const harvester = {
-            actions: [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
-            // actions: [WORK, WORK, CARRY, MOVE, MOVE],
-            name: `Harvester${harvesterCount + 1}`,
+        const stealer = {
+            actions: [WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+            name: `Stealer${stealersCount + 1}`,
             spawn: 'Spawn1',
             opts: {
                 memory: {
-                    role: CreepRole.HARVESTER,
-                    sourceId:
-                        (harvesterTypes[RoomEnergySources.SOUTH] ?? []).length >
-                        (harvesterTypes[RoomEnergySources.NORTH] ?? []).length
-                            ? RoomEnergySources.NORTH
-                            : RoomEnergySources.SOUTH
+                    role: CreepRole.STEALER,
+                    sourceId: RoomEnergySources.WEST
                 }
             }
         };
-        Creeps.create(harvester);
+        Creeps.create(stealer);
     },
     run: function (creep) {
         if (creep.memory.transfering && creep.store[RESOURCE_ENERGY] == 0) {
@@ -92,4 +103,4 @@ const Harvester: BaseCreep = {
     }
 };
 
-export default Harvester;
+export default Stealer;
