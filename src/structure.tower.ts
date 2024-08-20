@@ -9,7 +9,11 @@ const Tower = {
                 }
             } else {
                 const closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: struc => struc.structureType !== STRUCTURE_WALL && struc.hits < struc.hitsMax
+                    filter: struc =>
+                        (struc.structureType !== STRUCTURE_WALL &&
+                            struc.structureType !== STRUCTURE_RAMPART &&
+                            struc.hits < struc.hitsMax) ||
+                        (struc.structureType === STRUCTURE_RAMPART && struc.hits < 500000)
                 });
 
                 if (closestDamagedStructure) {

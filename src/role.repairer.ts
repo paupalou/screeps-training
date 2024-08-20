@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import Creeps, { BaseCreep, CreepRole } from './creep';
 
-const REPAIRERS = 1;
+const REPAIRERS = 2;
 
 const Repairer: BaseCreep = {
     role: CreepRole.REPAIRER,
@@ -13,7 +13,7 @@ const Repairer: BaseCreep = {
         }
 
         const repairer = {
-            actions: [WORK, CARRY, MOVE],
+            actions: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
             name: `Repairer${repairerCount + 1}`,
             spawn: 'Spawn1',
             opts: {
@@ -37,22 +37,28 @@ const Repairer: BaseCreep = {
             }
         } else {
             creep.memory.reparing = true;
-            const nonWallOrRoadStructures = creep.room.find(FIND_STRUCTURES, {
-                filter: structure => structure.structureType !== STRUCTURE_WALL &&
-                  structure.structureType !== STRUCTURE_ROAD && structure.hits < structure.hitsMax
+            const priorityStructures = creep.room.find(FIND_STRUCTURES, {
+                filter: structure =>
+                    (structure.structureType !== STRUCTURE_WALL &&
+                        structure.structureType !== STRUCTURE_ROAD &&
+                        structure.structureType !== STRUCTURE_RAMPART &&
+                        structure.hits < structure.hitsMax) ||
+                    (structure.structureType === STRUCTURE_RAMPART && structure.hits < 500000)
             });
 
-            if (nonWallOrRoadStructures.length > 0) {
-                if (creep.repair(nonWallOrRoadStructures[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(nonWallOrRoadStructures[0], { visualizePathStyle: { stroke: '#ffaa00' } });
+            console.log(priorityStructures[0]);
+
+            if (priorityStructures.length > 0) {
+                if (creep.repair(priorityStructures[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(priorityStructures[0], { visualizePathStyle: { stroke: '#ffaa00' } });
                 }
             } else {
-                const damagedStructures = creep.room.find(FIND_STRUCTURES, {
+                const nonPriorityStructures = creep.room.find(FIND_STRUCTURES, {
                     filter: structure => structure.hits < structure.hitsMax
                 });
-                if (damagedStructures.length > 0) {
-                    if (creep.repair(damagedStructures[0]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(damagedStructures[0], { visualizePathStyle: { stroke: '#ffaa00' } });
+                if (nonPriorityStructures.length > 0) {
+                    if (creep.repair(nonPriorityStructures[0]) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(nonPriorityStructures[0], { visualizePathStyle: { stroke: '#ffaa00' } });
                     }
                 }
             }
