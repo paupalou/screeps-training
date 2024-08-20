@@ -46,8 +46,6 @@ const Repairer: BaseCreep = {
                     (structure.structureType === STRUCTURE_RAMPART && structure.hits < 500000)
             });
 
-            console.log(priorityStructures[0]);
-
             if (priorityStructures.length > 0) {
                 if (creep.repair(priorityStructures[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(priorityStructures[0], { visualizePathStyle: { stroke: '#ffaa00' } });
