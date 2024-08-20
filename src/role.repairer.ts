@@ -52,7 +52,12 @@ const Repairer: BaseCreep = {
                 }
             } else {
                 const nonPriorityStructures = creep.room.find(FIND_STRUCTURES, {
-                    filter: structure => structure.hits < structure.hitsMax
+                    filter: structure => {
+                        if (structure.structureType === STRUCTURE_WALL) {
+                            return structure.hits < 1000000;
+                        }
+                        return structure.hits < structure.hitsMax;
+                    }
                 });
                 if (nonPriorityStructures.length > 0) {
                     if (creep.repair(nonPriorityStructures[0]) == ERR_NOT_IN_RANGE) {
