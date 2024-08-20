@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { log } from './utils';
+import { log } from 'utils/log';
 
 export enum CreepRole {
     HARVESTER = 'harvester',
