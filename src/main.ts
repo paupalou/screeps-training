@@ -9,18 +9,19 @@ import Repairer from './role.repairer';
 import Transporter, { TRANSPORTERS } from './role.transporter';
 import Stealer from './role.stealer';
 import Claimer from './role.claimer';
+import Invader from './role.invader';
 
 function respawnCreeps() {
     Transporter.spawn();
     if (Creeps.count(CreepRole.TRANSPORTER) < TRANSPORTERS) {
-      // do not create any other creep if we dont have expected transporter alive
-      return;
+        // do not create any other creep if we dont have expected transporter alive
+        return;
     }
 
     Harvester.spawn();
     if (Creeps.count(CreepRole.HARVESTER) < HARVESTERS) {
-      // do not create any other creep if we dont have expected harvesters alive
-      return;
+        // do not create any other creep if we dont have expected harvesters alive
+        return;
     }
 
     Upgrader.spawn();
@@ -28,6 +29,7 @@ function respawnCreeps() {
     Repairer.spawn();
     Stealer.spawn();
     Claimer.spawn();
+    Invader.spawn();
 }
 
 function cleanUp() {
@@ -43,7 +45,7 @@ export function loop(): void {
     cleanUp();
     respawnCreeps();
 
-    Towers.run(Game.rooms["E18S28"]);
+    Towers.run(Game.rooms['E18S28']);
 
     for (const name in Game.creeps) {
         const creep = Game.creeps[name];
@@ -79,6 +81,11 @@ export function loop(): void {
 
         if (creep.memory.role === CreepRole.CLAIMER) {
             Claimer.run(creep);
+            continue;
+        }
+
+        if (creep.memory.role === CreepRole.INVADER) {
+            Invader.run(creep);
             continue;
         }
     }

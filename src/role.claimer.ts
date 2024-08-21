@@ -42,8 +42,6 @@ const Claimer: BaseCreep = {
                     creep.moveTo(enemyController);
                 } else if (attack == OK) {
                     creep.say(`Controller downgraded`);
-                } else {
-                    console.log(`Attack controller ${attack}`);
                 }
             }
         }
