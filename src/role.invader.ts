@@ -3,9 +3,10 @@ import _ from 'lodash';
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 
 const MIDDLE_ROOM = 'E18S26';
-const TARGET_ROOM = 'E19S26';
+// const TARGET_ROOM = 'E19S26';
+const TARGET_ROOM = 'E18S25';
 
-export const INVADERS = 0;
+export const INVADERS = 2;
 
 const Invader: BaseCreep = {
     role: CreepRole.INVADER,
