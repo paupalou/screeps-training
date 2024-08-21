@@ -8,7 +8,8 @@ export enum CreepRole {
     UPGRADER = 'upgrader',
     REPAIRER = 'repairer',
     TRANSPORTER = 'transporter',
-    STEALER = 'stealer'
+    STEALER = 'stealer',
+    CLAIMER = 'claimer'
 }
 
 export interface BaseCreep {
@@ -84,8 +85,15 @@ function get(creep: Creep) {
     };
 }
 
+interface CreateCreep {
+  actions: BodyPartConstant[],
+  name: string,
+  spawn: string,
+  opts: Record<string, unknown>
+}
+
 function createCreep(
-    creep = {
+    creep: CreateCreep = {
         actions: [WORK, CARRY, MOVE],
         name: 'Harvester1',
         spawn: 'Spawn1',

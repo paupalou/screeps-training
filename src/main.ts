@@ -8,6 +8,7 @@ import Upgrader from './role.upgrader';
 import Repairer from './role.repairer';
 import Transporter, { TRANSPORTERS } from './role.transporter';
 import Stealer from './role.stealer';
+import Claimer from './role.claimer';
 
 function respawnCreeps() {
     Transporter.spawn();
@@ -26,6 +27,7 @@ function respawnCreeps() {
     Builder.spawn();
     Repairer.spawn();
     Stealer.spawn();
+    Claimer.spawn();
 }
 
 function cleanUp() {
@@ -72,6 +74,11 @@ export function loop(): void {
 
         if (creep.memory.role === CreepRole.STEALER) {
             Stealer.run(creep);
+            continue;
+        }
+
+        if (creep.memory.role === CreepRole.CLAIMER) {
+            Claimer.run(creep);
             continue;
         }
     }
