@@ -57,7 +57,7 @@ const Invader: BaseCreep = {
             const route = Game.map.findRoute(creep.room, TARGET_ROOM);
             if (route !== -2 && route.length > 0) {
                 const exit = creep.pos.findClosestByRange(route[0].exit);
-                exit && creep.moveTo(exit.x + 5, exit.y, { visualizePathStyle: { stroke: '#ffaa00' } });
+                exit && creep.moveTo(exit, { visualizePathStyle: { stroke: '#ffaa00' } });
             }
         } else if (creep.room != Game.rooms[TARGET_ROOM]) {
             const route = Game.map.findRoute(creep.room, MIDDLE_ROOM);
