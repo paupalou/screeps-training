@@ -1,16 +1,22 @@
-interface CreepMemory {
-    [name: string]: any;
-}
-interface FlagMemory {
-    [name: string]: any;
-}
-interface SpawnMemory {
-    [name: string]: any;
-}
-interface RoomMemory {
-    [name: string]: any;
-}
+import type { LoDashStatic } from 'lodash';
 
-interface Memory {
-    [key: string]: any;
+declare global {
+    const _: LoDashStatic;
+
+    interface CreepMemory {
+        [name: string]: any;
+    }
+    interface FlagMemory {
+        [name: string]: any;
+    }
+    interface SpawnMemory {
+        [name: string]: any;
+    }
+    interface RoomMemory {
+        [name: string]: any;
+    }
+
+    interface Memory {
+        [key: string]: any;
+    }
 }

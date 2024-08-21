@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import Creeps, { CreepRole } from './creep';
 import Towers from './structure.tower';
 import Builder from './role.builder';
@@ -10,6 +8,7 @@ import Transporter, { TRANSPORTERS } from './role.transporter';
 import Stealer from './role.stealer';
 import Claimer from './role.claimer';
 import Invader from './role.invader';
+import { RoomManager } from './room.manager';
 
 function respawnCreeps() {
     Transporter.spawn();
@@ -43,6 +42,7 @@ function cleanUp() {
 
 export function loop(): void {
     cleanUp();
+    RoomManager.start();
     respawnCreeps();
 
     Towers.run(Game.rooms['E18S28']);
