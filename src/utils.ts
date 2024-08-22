@@ -9,3 +9,18 @@ export function log(something: unknown) {
         return;
     }
 }
+
+export function getAdjacentPositions(point: RoomPosition, roomName: string) {
+    const possibleSpots = [
+        [-1, -1],
+        [0, -1],
+        [1, -1],
+        [-1, 0],
+        [1, 0],
+        [-1, 1],
+        [0, 1],
+        [1, 1]
+    ];
+
+    return _.map(possibleSpots, ([x, y]) => new RoomPosition(point.x + x, point.y + y, roomName));
+}

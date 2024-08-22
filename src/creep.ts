@@ -12,6 +12,7 @@ export enum CreepRole {
     CLAIMER = 'claimer',
     INVADER = 'invader',
     EXPANSION_BUILDER = 'expansion_builder',
+    EXPANSION_HARVESTER = 'expansion_harvester',
 }
 
 export interface BaseCreep {

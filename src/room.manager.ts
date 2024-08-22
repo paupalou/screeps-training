@@ -1,24 +1,41 @@
+import { RoomAnalyst } from './room.analyst';
 import { log } from './utils';
 
-class RoomMap {
-    #terrain: RoomTerrain;
-    constructor(room: string) {
-        this.#terrain = new Room.Terrain(room);
-    }
-
-    public isPositionPlain(pos: RoomPosition) {
-        return this.#terrain.get(pos.x, pos.y) == 0;
-    }
-
-    public canBuildInPosition(pos: RoomPosition) {
-        return this.#terrain.get(pos.x, pos.y) != TERRAIN_MASK_WALL;
-    }
+enum RoomType {
+    EXPANSION,
+    MAIN
 }
 
-class MyRoom {
+interface MyRooms {
+    [key: string]: {
+        type: RoomType;
+    };
+}
+
+const MY_ROOMS: MyRooms = {
+    E18S27: {
+        type: RoomType.EXPANSION
+    },
+    E18S28: {
+        type: RoomType.MAIN
+    }
+};
+
+export class MyRoom {
     #room: Room;
+    analyst: RoomAnalyst;
+
     constructor(room: Room) {
         this.#room = room;
+        this.analyst = new RoomAnalyst(this);
+    }
+
+    get name() {
+        return this.#room.name;
+    }
+
+    get memory() {
+        return this.#room.memory;
     }
 
     get spawn() {
@@ -45,71 +62,6 @@ class MyRoom {
         this.#room.memory.sources = roomSources;
         return _.map(roomSources, sourceId => Game.getObjectById<Source>(sourceId as Id<Source>));
     }
-
-    get harvestSpots() {
-        const roomSources = this.sources;
-        const roomSpawn = this.spawn ?? this.unfinishedSpawn;
-
-        _.forEach(roomSources, source => {
-            if (!source) {
-                return;
-            }
-
-            const storedSpots = this.#room.memory.harvestSpots;
-            if (storedSpots && Object.keys(storedSpots).length == roomSources.length) {
-                return this.#room.memory.harvestSpots;
-            }
-
-            const roomMap = new RoomMap(this.#room.name);
-
-            // Starting from top left
-            // [ (-1, -1), (0, -1), (1, -1) ]
-            // [ (-1,  0), SOURCE,  (1,  0) ]
-            // [ (-1,  1), (0, 1),  (1,  1) ]
-            const possibleSpots = [
-                [-1, -1],
-                [0, -1],
-                [1, -1],
-                [-1, 0],
-                [1, 0],
-                [-1, 1],
-                [0, 1],
-                [1, 1]
-            ];
-
-            const miningBestSpot = _.map(
-                possibleSpots,
-                ([x, y]) => new RoomPosition(source.pos.x + x, source.pos.y + y, this.#room.name)
-            )
-                .filter(adjacentSpot => roomMap.canBuildInPosition(adjacentSpot))
-                .reduce((acc, position) => {
-                    if (!acc) {
-                        return position;
-                    }
-
-                    if (PathFinder.search(acc, roomSpawn.pos).cost > PathFinder.search(position, roomSpawn.pos).cost) {
-                        return position;
-                    }
-
-                    return acc;
-                });
-
-            if (!miningBestSpot) {
-                return {};
-            }
-
-            if (storedSpots) {
-                this.#room.memory.harvestSpots = {
-                    ...storedSpots,
-                    [source.id]: [miningBestSpot.x, miningBestSpot.y]
-                };
-            } else {
-                this.#room.memory.harvestSpots = { [source.id]: [miningBestSpot.x, miningBestSpot.y] };
-            }
-        });
-
-        return this.#room.memory.harvestSpots;
-    }
 }
 
 function itsMyRoom(room: Room) {
@@ -121,7 +73,22 @@ export class RoomManager {
         _.forEach(Game.rooms, room => {
             if (itsMyRoom(room)) {
                 const myRoom = new MyRoom(room);
-                log(myRoom.harvestSpots);
+
+                if (MY_ROOMS[room.name].type == RoomType.MAIN) {
+                    return;
+                }
+
+                myRoom.analyst.sourceContainerSpots;
+
+                const containerSpots = myRoom.analyst.sourceContainerSpots;
+                _.forEach(Object.entries(containerSpots), ([sourceId, [x, y]]) => {
+                    const position = new RoomPosition(x, y, myRoom.name);
+                    const containerBuilt = _.find(
+                        position.lookFor(LOOK_STRUCTURES),
+                        structure => structure.structureType == STRUCTURE_CONTAINER
+                    );
+                    log(position.lookFor(LOOK_STRUCTURES));
+                });
             }
         });
     }
