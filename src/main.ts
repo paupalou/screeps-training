@@ -10,6 +10,9 @@ import Claimer from './role.claimer';
 import Invader from './role.invader';
 import { RoomManager } from './room.manager';
 import ExpansionBuilder from './role.expansionBuilder';
+import ExpansionEnergyBalancer from './role.expansionEnergyBalancer';
+import ExpansionRepairer from './role.expansionRepairer';
+import ExpansionUpgrader from './role.expansionUpgrader';
 
 function respawnCreeps() {
     Transporter.spawn();
@@ -30,7 +33,12 @@ function respawnCreeps() {
     Stealer.spawn();
     Claimer.spawn();
     Invader.spawn();
+
+    // Expansion
+    ExpansionUpgrader.spawn();
+    ExpansionEnergyBalancer.spawn();
     ExpansionBuilder.spawn();
+    ExpansionRepairer.spawn();
 }
 
 function cleanUp() {
@@ -93,6 +101,21 @@ export function loop(): void {
 
         if (creep.memory.role === CreepRole.EXPANSION_BUILDER) {
             ExpansionBuilder.run(creep);
+            continue;
+        }
+
+        if (creep.memory.role === CreepRole.EXPANSION_ENERGY_BALANCER) {
+            ExpansionEnergyBalancer.run(creep);
+            continue;
+        }
+
+        if (creep.memory.role === CreepRole.EXPANSION_REPAIRER) {
+            ExpansionRepairer.run(creep);
+            continue;
+        }
+
+        if (creep.memory.role === CreepRole.EXPANSION_UPGRADER) {
+            ExpansionUpgrader.run(creep);
             continue;
         }
     }

@@ -13,6 +13,9 @@ export enum CreepRole {
     INVADER = 'invader',
     EXPANSION_BUILDER = 'expansion_builder',
     EXPANSION_HARVESTER = 'expansion_harvester',
+    EXPANSION_ENERGY_BALANCER = 'expansion_energy_balancer',
+    EXPANSION_REPAIRER = 'expansion_repairer',
+    EXPANSION_UPGRADER = 'expansion_upgrader'
 }
 
 export interface BaseCreep {
@@ -89,10 +92,10 @@ function get(creep: Creep) {
 }
 
 interface CreateCreep {
-  actions: BodyPartConstant[],
-  name: string,
-  spawn: string,
-  opts: Record<string, unknown>
+    actions: BodyPartConstant[];
+    name: string;
+    spawn: string;
+    opts: Record<string, unknown>;
 }
 
 function createCreep(
