@@ -7,6 +7,14 @@ const TARGET_ROOM = 'E18S25';
 
 export const INVADERS = 2;
 
+function changeRoom(creep: Creep, target_room: string) {
+    const route = Game.map.findRoute(creep.room, target_room);
+    if (route !== -2 && route.length > 0) {
+        const exit = creep.pos.findClosestByRange(route[0].exit);
+        exit && creep.moveTo(exit, { visualizePathStyle: { stroke: '#ffaa00' } });
+    }
+}
+
 const Invader: BaseCreep = {
     role: CreepRole.INVADER,
     spawn: function () {
@@ -49,15 +57,15 @@ const Invader: BaseCreep = {
     },
     run: function (creep) {
         if (creep.room == Game.rooms[MIDDLE_ROOM]) {
-            if (creep.pos.x == 13 && creep.pos.y == 22) {
+            if (!creep.memory.in_middle_room && creep.pos.x == 13 && creep.pos.y == 22) {
                 creep.memory.in_middle_room = true;
-            } else if (!creep.memory.in_middle_room) {
+                changeRoom(creep, TARGET_ROOM);
+            } else {
                 creep.moveTo(13, 22, { visualizePathStyle: { stroke: '#ffaa00' } });
             }
-            const route = Game.map.findRoute(creep.room, TARGET_ROOM);
-            if (route !== -2 && route.length > 0) {
-                const exit = creep.pos.findClosestByRange(route[0].exit);
-                exit && creep.moveTo(exit, { visualizePathStyle: { stroke: '#ffaa00' } });
+
+            if (creep.memory.in_middle_room) {
+                changeRoom(creep, TARGET_ROOM);
             }
         } else if (creep.room != Game.rooms[TARGET_ROOM]) {
             const route = Game.map.findRoute(creep.room, MIDDLE_ROOM);
