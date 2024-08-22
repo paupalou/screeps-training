@@ -5,7 +5,7 @@ import Creeps, { type BaseCreep, CreepRole } from './creep';
 const MAIN_ROOM = 'E18S28';
 const TARGET_ROOM = 'E18S27';
 
-export const CLAIMERS = 2;
+export const CLAIMERS = 0;
 
 const Claimer: BaseCreep = {
     role: CreepRole.CLAIMER,

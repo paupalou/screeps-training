@@ -11,6 +11,7 @@ export enum CreepRole {
     STEALER = 'stealer',
     CLAIMER = 'claimer',
     INVADER = 'invader',
+    EXPANSION_BUILDER = 'expansion_builder',
 }
 
 export interface BaseCreep {

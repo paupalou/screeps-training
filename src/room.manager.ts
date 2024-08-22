@@ -9,6 +9,10 @@ class RoomMap {
     public isPositionPlain(pos: RoomPosition) {
         return this.#terrain.get(pos.x, pos.y) == 0;
     }
+
+    public canBuildInPosition(pos: RoomPosition) {
+        return this.#terrain.get(pos.x, pos.y) != TERRAIN_MASK_WALL;
+    }
 }
 
 class MyRoom {
@@ -25,6 +29,12 @@ class MyRoom {
         return this.#room.find(FIND_MY_SPAWNS)[0];
     }
 
+    get unfinishedSpawn() {
+        return this.#room.find(FIND_MY_CONSTRUCTION_SITES, {
+            filter: structure => structure.structureType === STRUCTURE_SPAWN
+        })[0];
+    }
+
     get sources() {
         const storedSources: string[] | undefined = this.#room.memory.sources;
         if (storedSources) {
@@ -36,14 +46,20 @@ class MyRoom {
         return _.map(roomSources, sourceId => Game.getObjectById<Source>(sourceId as Id<Source>));
     }
 
-    get sourceContainers() {
+    get harvestSpots() {
         const roomSources = this.sources;
-        const roomSpawn = this.spawn;
+        const roomSpawn = this.spawn ?? this.unfinishedSpawn;
 
         _.forEach(roomSources, source => {
             if (!source) {
                 return;
             }
+
+            const storedSpots = this.#room.memory.harvestSpots;
+            if (storedSpots && Object.keys(storedSpots).length == roomSources.length) {
+                return this.#room.memory.harvestSpots;
+            }
+
             const roomMap = new RoomMap(this.#room.name);
 
             // Starting from top left
@@ -65,7 +81,7 @@ class MyRoom {
                 possibleSpots,
                 ([x, y]) => new RoomPosition(source.pos.x + x, source.pos.y + y, this.#room.name)
             )
-                .filter(adjacentSpot => roomMap.isPositionPlain(adjacentSpot))
+                .filter(adjacentSpot => roomMap.canBuildInPosition(adjacentSpot))
                 .reduce((acc, position) => {
                     if (!acc) {
                         return position;
@@ -78,14 +94,21 @@ class MyRoom {
                     return acc;
                 });
 
-            if (miningBestSpot) {
-                log(
-                    `mining best spot for source (${source.pos.x},${source.pos.y}) is (${miningBestSpot.x}, ${miningBestSpot.y})`
-                );
+            if (!miningBestSpot) {
+                return {};
+            }
+
+            if (storedSpots) {
+                this.#room.memory.harvestSpots = {
+                    ...storedSpots,
+                    [source.id]: [miningBestSpot.x, miningBestSpot.y]
+                };
+            } else {
+                this.#room.memory.harvestSpots = { [source.id]: [miningBestSpot.x, miningBestSpot.y] };
             }
         });
 
-        return '';
+        return this.#room.memory.harvestSpots;
     }
 }
 
@@ -98,7 +121,7 @@ export class RoomManager {
         _.forEach(Game.rooms, room => {
             if (itsMyRoom(room)) {
                 const myRoom = new MyRoom(room);
-                log(myRoom.sourceContainers);
+                log(myRoom.harvestSpots);
             }
         });
     }

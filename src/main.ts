@@ -9,6 +9,7 @@ import Stealer from './role.stealer';
 import Claimer from './role.claimer';
 import Invader from './role.invader';
 import { RoomManager } from './room.manager';
+import ExpansionBuilder from './role.expansionBuilder';
 
 function respawnCreeps() {
     Transporter.spawn();
@@ -29,6 +30,7 @@ function respawnCreeps() {
     Stealer.spawn();
     Claimer.spawn();
     Invader.spawn();
+    ExpansionBuilder.spawn();
 }
 
 function cleanUp() {
@@ -42,7 +44,7 @@ function cleanUp() {
 
 export function loop(): void {
     cleanUp();
-    // RoomManager.start();
+    RoomManager.start();
     respawnCreeps();
 
     Towers.run(Game.rooms['E18S28']);
@@ -86,6 +88,11 @@ export function loop(): void {
 
         if (creep.memory.role === CreepRole.INVADER) {
             Invader.run(creep);
+            continue;
+        }
+
+        if (creep.memory.role === CreepRole.EXPANSION_BUILDER) {
+            ExpansionBuilder.run(creep);
             continue;
         }
     }
