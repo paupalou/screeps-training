@@ -8,8 +8,32 @@ import Transporter, { TRANSPORTERS } from './role.transporter';
 import Stealer from './role.stealer';
 import Claimer from './role.claimer';
 import Invader from './role.invader';
-import { RoomManager } from './room.manager';
 import ExpansionBuilder from './role.expansionBuilder';
+import { MyRoom } from './room';
+
+enum RoomType {
+    EXPANSION,
+    MAIN
+}
+
+interface MyRooms {
+    [key: string]: {
+        type: RoomType;
+    };
+}
+
+const MY_ROOMS: MyRooms = {
+    E18S27: {
+        type: RoomType.EXPANSION
+    },
+    E18S28: {
+        type: RoomType.MAIN
+    }
+};
+
+function itsMyRoom(room: Room) {
+    return room.controller?.my;
+}
 
 function respawnCreeps() {
     Transporter.spawn();
@@ -44,7 +68,54 @@ function cleanUp() {
 
 export function loop(): void {
     cleanUp();
-    RoomManager.start();
+
+    // START ROOM MANAGEMENT
+    _.forEach(Game.rooms, room => {
+        if (itsMyRoom(room)) {
+            if (MY_ROOMS[room.name].type == RoomType.MAIN) {
+                return;
+            }
+
+            const myRoom = new MyRoom(room);
+            myRoom.init();
+
+            // const containerSpots = myRoom.analyst.sourceContainerSpots;
+            // const roomHarvesters = myRoom.harvesters;
+            //
+            // if (roomHarvesters.length < Object.keys(containerSpots).length) {
+            //     const expansionHarvester = {
+            //         actions: [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+            //         name: `ExpansionHarvester${roomHarvesters.length + 1}`,
+            //         spawn: 'Spawn1',
+            //         opts: {
+            //             memory: {
+            //                 role: CreepRole.EXPANSION_HARVESTER
+            //             }
+            //         }
+            //     };
+            //     if (!Game.spawns['Spawn1'].spawning) {
+            //         Creeps.create(expansionHarvester);
+            //         // log(`Spawning ExpansionHarvester${roomHarvesters.length + 1}`);
+            //     }
+            // }
+            //
+            // _.forEach(roomHarvesters, harvester => {
+            //     harvester.run();
+            // });
+
+            // _.forEach(Object.entries(containerSpots), ([sourceId, [x, y]]) => {
+            //     const position = new RoomPosition(x, y, myRoom.name);
+            // const containerBuilt = _.find(
+            //     position.lookFor(LOOK_STRUCTURES),
+            //     structure => structure.structureType == STRUCTURE_CONTAINER
+            // );
+
+            // const roomHarvesters = myRoom.harvesters;
+            // log(roomHarvesters);
+            // });
+        }
+    });
+    // END ROOM MANAGEMENT
     respawnCreeps();
 
     Towers.run(Game.rooms['E18S28']);
