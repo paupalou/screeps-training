@@ -6,7 +6,7 @@ import { log } from './utils';
 const MAIN_ROOM = 'E18S28';
 const TARGET_ROOM = 'E18S27';
 
-export const EXPANSION_BUILDERS = 1;
+export const EXPANSION_BUILDERS = 3;
 
 const ExpansionBuilder: BaseCreep = {
     role: CreepRole.EXPANSION_BUILDER,
@@ -38,23 +38,40 @@ const ExpansionBuilder: BaseCreep = {
         } else {
             if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
                 creep.memory.building = false;
-                creep.say('🔄 harvest');
             }
             if (!creep.memory.building && creep.store.getFreeCapacity() == 0) {
                 creep.memory.building = true;
-                creep.say('🚧 build');
             }
 
             if (creep.store.energy === 0 || (!creep.memory.building && creep.store.getFreeCapacity() > 0)) {
-                const source = creep.pos.findClosestByPath(FIND_SOURCES);
-                if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
+                const containers = creep.room
+                    .find<StructureContainer>(FIND_STRUCTURES, {
+                        filter: structure =>
+                            structure.structureType == STRUCTURE_CONTAINER &&
+                            structure.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)
+                    })
+                    .sort((sA, sB) => {
+                        if (sB.store.energy > sA.store.energy) {
+                            return 1;
+                        } else if (sA.store.energy > sB.store.energy) {
+                            return -1;
+                        }
+                        return 0;
+                    });
+
+                const container = _.first(containers);
+                log(containers.map((c) => c.store.energy));
+                log(container?.store.energy);
+
+                if (container) {
+                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
+                    }
                 }
             } else {
                 creep.memory.building = true;
                 const constructionSites = Creeps.get(creep).constructionSites();
                 if (constructionSites && constructionSites.length) {
-                    log(constructionSites);
                     if (creep.build(constructionSites[0]) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(constructionSites[0], { visualizePathStyle: { stroke: '#ffffff' } });
                     }
