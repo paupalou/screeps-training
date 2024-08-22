@@ -1,5 +1,16 @@
 import { log } from './utils';
 
+class RoomMap {
+    #terrain: RoomTerrain;
+    constructor(room: string) {
+        this.#terrain = new Room.Terrain(room);
+    }
+
+    public isPositionPlain(pos: RoomPosition) {
+        return this.#terrain.get(pos.x, pos.y) == 0;
+    }
+}
+
 class MyRoom {
     #room: Room;
     constructor(room: Room) {
@@ -27,16 +38,51 @@ class MyRoom {
 
     get sourceContainers() {
         const roomSources = this.sources;
+        const roomSpawn = this.spawn;
+
         _.forEach(roomSources, source => {
             if (!source) {
                 return;
             }
-            log(`checking mining spot for source ${source.pos.x},${source.pos.y})`);
+            const roomMap = new RoomMap(this.#room.name);
 
-            const bottomLeftSpot = RoomPosition(source.pos.x - 1, source.pos.y + 1, this.#room.name);
-            const bottomRightSpot = RoomPosition(source.pos.x + 1, source.pos.y + 1, this.#room.name);
-            const topLeftSpot = RoomPosition(source.pos.x - 1, source.pos.y - 1, this.#room.name);
-            const topRightSpot = RoomPosition(source.pos.x + 1, source.pos.y - 1, this.#room.name);
+            // Starting from top left
+            // [ (-1, -1), (0, -1), (1, -1) ]
+            // [ (-1,  0), SOURCE,  (1,  0) ]
+            // [ (-1,  1), (0, 1),  (1,  1) ]
+            const possibleSpots = [
+                [-1, -1],
+                [0, -1],
+                [1, -1],
+                [-1, 0],
+                [1, 0],
+                [-1, 1],
+                [0, 1],
+                [1, 1]
+            ];
+
+            const miningBestSpot = _.map(
+                possibleSpots,
+                ([x, y]) => new RoomPosition(source.pos.x + x, source.pos.y + y, this.#room.name)
+            )
+                .filter(adjacentSpot => roomMap.isPositionPlain(adjacentSpot))
+                .reduce((acc, position) => {
+                    if (!acc) {
+                        return position;
+                    }
+
+                    if (PathFinder.search(acc, roomSpawn.pos).cost > PathFinder.search(position, roomSpawn.pos).cost) {
+                        return position;
+                    }
+
+                    return acc;
+                });
+
+            if (miningBestSpot) {
+                log(
+                    `mining best spot for source (${source.pos.x},${source.pos.y}) is (${miningBestSpot.x}, ${miningBestSpot.y})`
+                );
+            }
         });
 
         return '';

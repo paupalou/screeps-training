@@ -5,7 +5,7 @@ import Creeps, { type BaseCreep, CreepRole } from './creep';
 const MIDDLE_ROOM = 'E18S26';
 const TARGET_ROOM = 'E18S25';
 
-export const INVADERS = 2;
+export const INVADERS = 0;
 
 function changeRoom(creep: Creep, target_room: string) {
     const route = Game.map.findRoute(creep.room, target_room);

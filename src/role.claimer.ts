@@ -35,13 +35,20 @@ const Claimer: BaseCreep = {
                 exit && creep.moveTo(exit);
             }
         } else {
-            const enemyController = creep.room.controller;
-            if (enemyController) {
-                const attack = creep.attackController(enemyController);
+            const roomController = creep.room.controller;
+            if (roomController && roomController.owner && !roomController.my) {
+                const attack = creep.attackController(roomController);
                 if (attack == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(enemyController);
+                    creep.moveTo(roomController);
                 } else if (attack == OK) {
                     creep.say(`Controller downgraded`);
+                }
+            } else if (roomController && !roomController.owner) {
+                const claim = creep.claimController(roomController);
+                if (claim == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(roomController);
+                } else if (claim == OK) {
+                    creep.say(`Controller claimed`);
                 }
             }
         }

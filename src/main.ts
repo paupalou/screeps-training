@@ -42,7 +42,7 @@ function cleanUp() {
 
 export function loop(): void {
     cleanUp();
-    RoomManager.start();
+    // RoomManager.start();
     respawnCreeps();
 
     Towers.run(Game.rooms['E18S28']);
