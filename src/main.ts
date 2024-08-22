@@ -77,7 +77,6 @@ export function loop(): void {
             }
 
             const myRoom = new MyRoom(room);
-            myRoom.init();
 
             // const containerSpots = myRoom.analyst.sourceContainerSpots;
             // const roomHarvesters = myRoom.harvesters;
