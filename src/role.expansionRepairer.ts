@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 
-export const EXPANSION_REPAIRERS = 2;
+export const EXPANSION_REPAIRERS = 1;
 
 function repair(creep: Creep) {
     const priorityStructures = creep.room.find(FIND_STRUCTURES, {
@@ -44,7 +44,7 @@ const ExpansionRepairer: BaseCreep = {
         }
 
         const expansionRepairer = {
-            actions: [WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+            actions: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
             name: `ExpansionRepairer${expansionRepairerCount + 1}`,
             spawn: 'Spawn2',
             opts: {
