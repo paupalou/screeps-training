@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 
-export const EXPANSION_BUILDERS = 3;
+export const EXPANSION_BUILDERS = 1;
 
 const ExpansionBuilder: BaseCreep = {
     role: CreepRole.EXPANSION_BUILDER,
