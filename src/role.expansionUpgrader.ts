@@ -36,21 +36,35 @@ const ExpansionUpgrader: BaseCreep = {
             const controllerContainer = Game.getObjectById('66c7618b818067966b922da7' as Id<StructureContainer>);
 
             if (controllerContainer) {
-                if (creep.withdraw(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                const withdrawAction = creep.withdraw(controllerContainer, RESOURCE_ENERGY);
+                if (withdrawAction == ERR_NOT_IN_RANGE) {
                     creep.moveTo(controllerContainer, { visualizePathStyle: { stroke: '#ffffff' } });
+                } else if (controllerContainer && creep.pos.y <= controllerContainer.pos.y) {
+                    creep.moveTo(creep.pos.x, creep.pos.y + 1, { visualizePathStyle: { stroke: '#ffaa00' } });
                 }
             }
         } else if (creep.room.controller && creep.room.controller.my) {
             creep.memory.upgrading = true;
 
             const upgradeAction = creep.upgradeController(creep.room.controller);
-            const controllerContainer = Game.getObjectById('66c7618b818067966b922da7' as Id<StructureContainer>);
 
             if (upgradeAction == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#ffaa00' } });
-            } else if (upgradeAction == OK && controllerContainer && creep.pos.y <= controllerContainer.pos.y) {
-                creep.moveTo(creep.pos.x, creep.pos.y + 1, { visualizePathStyle: { stroke: '#ffaa00' } });
+                return;
             }
+
+            const controllerContainer = Game.getObjectById('66c7618b818067966b922da7' as Id<StructureContainer>);
+            if (controllerContainer && creep.pos.y <= controllerContainer.pos.y) {
+                const otherUpgraders = Creeps.getByRole(CreepRole.EXPANSION_UPGRADER);
+                if (otherUpgraders.every(upg => upg.pos.x != creep.pos.x - 1 && upg.pos.y != creep.pos.y + 1)) {
+                    creep.moveTo(creep.pos.x - 1, creep.pos.y + 1, { visualizePathStyle: { stroke: '#ffaa00' } });
+                } else if (otherUpgraders.every(upg => upg.pos.x != creep.pos.x && upg.pos.y != creep.pos.y + 1)) {
+                    creep.moveTo(creep.pos.x, creep.pos.y + 1, { visualizePathStyle: { stroke: '#ffaa00' } });
+                } else {
+                    creep.moveTo(creep.pos.x + 1, creep.pos.y + 1, { visualizePathStyle: { stroke: '#ffaa00' } });
+                }
+            }
+
         }
     }
 };
