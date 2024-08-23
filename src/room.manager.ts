@@ -97,18 +97,17 @@ export class RoomManager {
 
                 if (roomHarvesters.length < Object.keys(containerSpots).length) {
                     const expansionHarvester = {
-                        actions: [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+                        actions: [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE],
                         name: `ExpansionHarvester${roomHarvesters.length + 1}`,
-                        spawn: 'Spawn1',
+                        spawn: 'Spawn2',
                         opts: {
                             memory: {
                                 role: CreepRole.EXPANSION_HARVESTER
                             }
                         }
                     };
-                    if (!Game.spawns['Spawn1'].spawning) {
+                    if (!Game.spawns['Spawn2'].spawning) {
                         Creeps.create(expansionHarvester);
-                        // log(`Spawning ExpansionHarvester${roomHarvesters.length + 1}`);
                     }
                 }
 
