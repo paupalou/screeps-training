@@ -15,6 +15,8 @@ import ExpansionRepairer from './role.expansionRepairer';
 import ExpansionUpgrader from './role.expansionUpgrader';
 import Profiler from './profiler';
 
+const PROFILE = true;
+
 function respawnCreeps() {
     Transporter.spawn();
     if (Creeps.count(CreepRole.TRANSPORTER) < TRANSPORTERS) {
@@ -51,7 +53,7 @@ function cleanUp() {
     }
 }
 
-Profiler.enable();
+PROFILE && Profiler.enable();
 
 export function loop(): void {
     Profiler.wrap(function () {
