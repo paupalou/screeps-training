@@ -13,6 +13,7 @@ import ExpansionBuilder from './role.expansionBuilder';
 import ExpansionEnergyBalancer from './role.expansionEnergyBalancer';
 import ExpansionRepairer from './role.expansionRepairer';
 import ExpansionUpgrader from './role.expansionUpgrader';
+import Profiler from './profiler';
 
 function respawnCreeps() {
     Transporter.spawn();
@@ -50,74 +51,78 @@ function cleanUp() {
     }
 }
 
+Profiler.enable();
+
 export function loop(): void {
-    cleanUp();
-    RoomManager.start();
-    respawnCreeps();
+    Profiler.wrap(function () {
+        cleanUp();
+        RoomManager.start();
+        respawnCreeps();
 
-    Towers.run(Game.rooms['E18S28']);
-    Towers.run(Game.rooms['E18S27']);
+        Towers.run(Game.rooms['E18S28']);
+        Towers.run(Game.rooms['E18S27']);
 
-    for (const name in Game.creeps) {
-        const creep = Game.creeps[name];
-        if (creep.memory.role === CreepRole.HARVESTER) {
-            Harvester.run(creep);
-            continue;
+        for (const name in Game.creeps) {
+            const creep = Game.creeps[name];
+            if (creep.memory.role === CreepRole.HARVESTER) {
+                Harvester.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.BUILDER) {
+                Builder.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.UPGRADER) {
+                Upgrader.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.REPAIRER) {
+                Repairer.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.TRANSPORTER) {
+                Transporter.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.STEALER) {
+                Stealer.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.CLAIMER) {
+                Claimer.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.INVADER) {
+                Invader.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.EXPANSION_BUILDER) {
+                ExpansionBuilder.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.EXPANSION_ENERGY_BALANCER) {
+                ExpansionEnergyBalancer.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.EXPANSION_REPAIRER) {
+                ExpansionRepairer.run(creep);
+                continue;
+            }
+
+            if (creep.memory.role === CreepRole.EXPANSION_UPGRADER) {
+                ExpansionUpgrader.run(creep);
+                continue;
+            }
         }
-
-        if (creep.memory.role === CreepRole.BUILDER) {
-            Builder.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.UPGRADER) {
-            Upgrader.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.REPAIRER) {
-            Repairer.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.TRANSPORTER) {
-            Transporter.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.STEALER) {
-            Stealer.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.CLAIMER) {
-            Claimer.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.INVADER) {
-            Invader.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.EXPANSION_BUILDER) {
-            ExpansionBuilder.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.EXPANSION_ENERGY_BALANCER) {
-            ExpansionEnergyBalancer.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.EXPANSION_REPAIRER) {
-            ExpansionRepairer.run(creep);
-            continue;
-        }
-
-        if (creep.memory.role === CreepRole.EXPANSION_UPGRADER) {
-            ExpansionUpgrader.run(creep);
-            continue;
-        }
-    }
+    });
 }
