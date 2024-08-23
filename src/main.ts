@@ -56,6 +56,7 @@ export function loop(): void {
     respawnCreeps();
 
     Towers.run(Game.rooms['E18S28']);
+    Towers.run(Game.rooms['E18S27']);
 
     for (const name in Game.creeps) {
         const creep = Game.creeps[name];

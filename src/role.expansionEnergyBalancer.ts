@@ -3,7 +3,7 @@ import _ from 'lodash';
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 import { log } from './utils';
 
-export const EXPANSION_ENERGY_BALANCERS = 3;
+export const EXPANSION_ENERGY_BALANCERS = 4;
 
 function transfer(creep: Creep) {
     const spawn = Creeps.get(creep).spawn();
@@ -16,13 +16,27 @@ function transfer(creep: Creep) {
 
     // log(`spawnEnergy ${spawnEnergy}`)
     // log(`spawnEnergyCapactity ${spawnEnergyCapactity}`)
-    if (spawnEnergy < spawnEnergyCapactity) {
+    if (Math.floor(spawnEnergy / spawnEnergyCapactity) * 100 < 80) {
         const extensionsFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
             filter: (structure: AnyStructure) =>
                 structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
         };
         const closest = creep.pos.findClosestByPath([...spawn, ...Creeps.get(creep).spawnExtensions(extensionsFilter)]);
         Creeps.transfer(creep).to(closest);
+        return;
+    }
+
+    // towers
+    const towersFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
+        filter: (structure: AnyStructure) =>
+            structure.structureType == STRUCTURE_TOWER &&
+            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
+            Math.floor(structure.store.energy / structure.store.getFreeCapacity(RESOURCE_ENERGY)) * 100 < 80
+    };
+    const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
+
+    if (closestTower) {
+        Creeps.transfer(creep).to(closestTower);
         return;
     }
 
