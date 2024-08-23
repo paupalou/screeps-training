@@ -5,6 +5,60 @@ import { log } from './utils';
 
 export const EXPANSION_UPGRADERS = 3;
 
+function takePositionRelativeToContainer(creep: Creep) {
+    const controllerContainer = Game.getObjectById('66c7618b818067966b922da7' as Id<StructureContainer>);
+
+    if (controllerContainer && creep.pos.y > controllerContainer.pos.y) {
+        return;
+    }
+
+    const otherUpgraders = Creeps.getByRole(CreepRole.EXPANSION_UPGRADER).filter(upg => upg.id != creep.id);
+    if (controllerContainer && creep.pos.y <= controllerContainer.pos.y) {
+        const containerBottomRight = new RoomPosition(
+            controllerContainer.pos.x + 1,
+            controllerContainer.pos.y + 1,
+            creep.room.name
+        );
+        let creepInPosition = otherUpgraders.some(
+            upg => upg.pos.x == containerBottomRight.x && upg.pos.y == containerBottomRight.y
+        );
+
+        if (!creepInPosition) {
+            creep.moveTo(containerBottomRight);
+
+            return;
+        }
+
+        const containerBottomCenter = new RoomPosition(
+            controllerContainer.pos.x,
+            controllerContainer.pos.y + 1,
+            creep.room.name
+        );
+        creepInPosition = otherUpgraders.some(
+            upg => upg.pos.x == containerBottomCenter.x && upg.pos.y == containerBottomCenter.y
+        );
+
+        if (!creepInPosition) {
+            creep.moveTo(containerBottomCenter);
+
+            return;
+        }
+
+        const containerBottomLeft = new RoomPosition(
+            controllerContainer.pos.x - 1,
+            controllerContainer.pos.y + 1,
+            creep.room.name
+        );
+        creepInPosition = otherUpgraders.some(
+            upg => upg.pos.x == containerBottomLeft.x && upg.pos.y == containerBottomLeft.y
+        );
+
+        if (!creepInPosition) {
+            creep.moveTo(containerBottomLeft);
+        }
+    }
+}
+
 const ExpansionUpgrader: BaseCreep = {
     role: CreepRole.EXPANSION_UPGRADER,
     spawn: function () {
@@ -33,8 +87,6 @@ const ExpansionUpgrader: BaseCreep = {
             creep.memory.upgrading = true;
         }
 
-        const otherUpgraders = Creeps.getByRole(CreepRole.EXPANSION_UPGRADER).filter(upg => upg.id != creep.id);
-
         if (creep.store.energy === 0 || (!creep.memory.upgrading && creep.store.getFreeCapacity() > 0)) {
             const controllerContainer = Game.getObjectById('66c7618b818067966b922da7' as Id<StructureContainer>);
 
@@ -45,16 +97,7 @@ const ExpansionUpgrader: BaseCreep = {
                     return;
                 }
 
-                // if (otherUpgraders.every(upg => upg.pos.x != creep.pos.x + 1 && upg.pos.y != creep.pos.y + 1)) {
-                //     log(`no creeps in ${creep.pos.x + 1} ${creep.pos.y + 1}`);
-                //     creep.moveTo(creep.pos.x + 1, creep.pos.y + 1, { visualizePathStyle: { stroke: '#ffaa00' } });
-                // } else if (otherUpgraders.every(upg => upg.pos.x != creep.pos.x && upg.pos.y != creep.pos.y + 1)) {
-                //     log(`no creeps in ${creep.pos.x} ${creep.pos.y + 1}`);
-                //     creep.moveTo(creep.pos.x, creep.pos.y + 1, { visualizePathStyle: { stroke: '#ffaa00' } });
-                // } else if (otherUpgraders.every(upg => upg.pos.x != creep.pos.x - 1 && upg.pos.y != creep.pos.y + 1)) {
-                //     log(`no creeps in ${creep.pos.x - 1} ${creep.pos.y + 11}`);
-                //     creep.moveTo(creep.pos.x - 1, creep.pos.y + 1, { visualizePathStyle: { stroke: '#ffaa00' } });
-                // }
+                takePositionRelativeToContainer(creep);
             }
         } else if (creep.room.controller && creep.room.controller.my) {
             creep.memory.upgrading = true;
@@ -66,39 +109,7 @@ const ExpansionUpgrader: BaseCreep = {
                 return;
             }
 
-            const controllerContainer = Game.getObjectById('66c7618b818067966b922da7' as Id<StructureContainer>);
-            if (controllerContainer && creep.pos.y <= controllerContainer.pos.y) {
-                log(`creep ${creep.name} is outpositioned ${creep.pos.x} ${creep.pos.y}`);
-                log(otherUpgraders.map(upg => `${upg.pos.x},${upg.pos.y}`));
-                if (
-                    otherUpgraders.every(
-                        upg => upg.pos.x != controllerContainer.pos.x + 1 && upg.pos.y != controllerContainer.pos.y + 1
-                    )
-                ) {
-                    log(`no creeps in ${creep.pos.x + 1} ${controllerContainer.pos.y + 1}`);
-                    creep.moveTo(creep.pos.x + 1, controllerContainer.pos.y + 1, {
-                        visualizePathStyle: { stroke: '#ffaa00' }
-                    });
-                } else if (
-                    otherUpgraders.every(
-                        upg => upg.pos.x != controllerContainer.pos.x && upg.pos.y != controllerContainer.pos.y + 1
-                    )
-                ) {
-                    log(`no creeps in ${creep.pos.x} ${controllerContainer.pos.y + 1}`);
-                    creep.moveTo(creep.pos.x, controllerContainer.pos.y + 1, {
-                        visualizePathStyle: { stroke: '#ffaa00' }
-                    });
-                } else if (
-                    otherUpgraders.every(
-                        upg => upg.pos.x != controllerContainer.pos.x - 1 && upg.pos.y != controllerContainer.pos.y + 1
-                    )
-                ) {
-                    log(`no creeps in ${creep.pos.x - 1} ${controllerContainer.pos.y + 1}`);
-                    creep.moveTo(creep.pos.x - 1, controllerContainer.pos.y + 1, {
-                        visualizePathStyle: { stroke: '#ffaa00' }
-                    });
-                }
-            }
+            takePositionRelativeToContainer(creep);
         }
     }
 };
