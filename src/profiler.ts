@@ -15,20 +15,21 @@ function AlreadyWrappedError(this: WrapperError) {
   this.message = 'Error attempted to double wrap a function.';
   this.stack = ((new Error())).stack;
 }
+interface IPrototype { prototype: any; }
 
 function setupProfiler() {
   depth = 0; // reset depth, this needs to be done each tick.
-  Game.profiler = {
-    stream(duration, filter) {
+  (Game as IPrototype & Game).prototype.profiler = {
+    stream(duration: number, filter: unknown) {
       setupMemory('stream', duration || 10, filter);
     },
-    email(duration, filter) {
+    email(duration: number, filter: unknown) {
       setupMemory('email', duration || 100, filter);
     },
-    profile(duration, filter) {
+    profile(duration: number, filter: unknown) {
       setupMemory('profile', duration || 100, filter);
     },
-    background(filter) {
+    background(filter: unknown) {
       setupMemory('background', false, filter);
     },
     restart() {
