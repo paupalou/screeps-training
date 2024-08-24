@@ -38,6 +38,7 @@ function transfer(creep: Creep) {
             return;
         }
 
+        log(creep.store.getUsedCapacity())
         const amount =
             target.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.energy
                 ? creep.store.energy

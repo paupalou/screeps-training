@@ -2,16 +2,33 @@ import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 
-export const TRANSPORTERS = 1;
+export const TRANSPORTERS = 3;
 
 function almostFullContainer(creep: Creep) {
-    return creep.pos.findClosestByPath<StructureContainer>(FIND_STRUCTURES, {
-        filter: structure =>
-            structure.structureType == STRUCTURE_CONTAINER && structure.store.getFreeCapacity(RESOURCE_ENERGY) < 1500
-    });
+    // return creep.pos.findClosestByPath<StructureContainer>(FIND_STRUCTURES, {
+    //     filter: structure =>
+    //         structure.structureType == STRUCTURE_CONTAINER && structure.store.getFreeCapacity(RESOURCE_ENERGY) < 1500
+    // });
+    //
+    const containers = creep.room
+        .find<StructureContainer>(FIND_STRUCTURES, {
+            filter: structure =>
+                structure.structureType == STRUCTURE_CONTAINER &&
+                structure.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)
+        })
+        .sort((sA, sB) => {
+            if (sB.store.energy > sA.store.energy) {
+                return 1;
+            } else if (sA.store.energy > sB.store.energy) {
+                return -1;
+            }
+            return 0;
+        });
+
+    return _.first(containers);
 }
 
-function withdrawResources(creep: Creep, target: StructureContainer | null) {
+function withdrawResources(creep: Creep, target: StructureContainer | undefined) {
     const droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
     if (droppedEnergy) {
         if (creep.pickup(droppedEnergy) == ERR_NOT_IN_RANGE) {
@@ -32,26 +49,35 @@ function withdrawResources(creep: Creep, target: StructureContainer | null) {
 }
 
 function storeResources(creep: Creep) {
-    const extensionsFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
-        filter: (structure: AnyStructure) =>
-            structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-    };
+    const spawn = Creeps.get(creep).spawn();
+    const extensions = Creeps.get(creep).spawnExtensions();
 
-    const closestNonTower = creep.pos.findClosestByPath([
-        ...Creeps.get(creep).spawn(),
-        ...Creeps.get(creep).spawnExtensions(extensionsFilter)
-    ]);
+    const spawnEnergy = (spawn[0]?.store.energy ?? 0) + extensions.reduce((acc, curr) => acc + curr.store.energy, 0);
+    const spawnEnergyCapactity =
+        (spawn[0]?.store.getCapacity(RESOURCE_ENERGY) ?? 0) +
+        extensions.reduce((acc, curr) => acc + curr.store.getCapacity(RESOURCE_ENERGY), 0);
 
-    if (closestNonTower) {
-        Creeps.transfer(creep).to(closestNonTower);
-    } else {
-        const towersFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
+    if (Math.floor((spawnEnergy / spawnEnergyCapactity) * 100) < 80) {
+        const extensionsFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
             filter: (structure: AnyStructure) =>
-                structure.structureType == STRUCTURE_TOWER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
         };
-        const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
+        const closest = creep.pos.findClosestByPath([...spawn, ...Creeps.get(creep).spawnExtensions(extensionsFilter)]);
+        Creeps.transfer(creep).to(closest);
+        return;
+    }
 
-        closestTower && Creeps.transfer(creep).to(closestTower);
+    // towers
+    const towersFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
+        filter: (structure: AnyStructure) =>
+            structure.structureType == STRUCTURE_TOWER &&
+            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
+            Math.floor((structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY)) * 100) < 80
+    };
+    const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
+    if (closestTower) {
+        Creeps.transfer(creep).to(closestTower);
+        return;
     }
 }
 
