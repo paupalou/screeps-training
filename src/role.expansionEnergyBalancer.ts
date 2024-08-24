@@ -1,11 +1,10 @@
 import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
-import { log } from './utils';
 
 export const EXPANSION_ENERGY_BALANCERS = 2;
 
-function getCostOfMovement(from: Structure, to: Structure) {
+function getDistance(from: Structure, to: Structure) {
     return from.pos.getRangeTo(to.pos);
 }
 
@@ -81,12 +80,6 @@ function transfer(creep: Creep) {
     };
     const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
     if (closestTower) {
-        log(
-            `energy percentage at tower ${Math.floor((closestTower.store.energy / closestTower.store.getCapacity(RESOURCE_ENERGY)) * 100)}%`
-        );
-    }
-
-    if (closestTower) {
         Creeps.transfer(creep).to(closestTower);
         return;
     }
@@ -115,7 +108,7 @@ const ExpansionEnergyBalancer: BaseCreep = {
         let distanceOfContainers = 5;
 
         if (from && to) {
-            distanceOfContainers = getCostOfMovement(from, to);
+            distanceOfContainers = getDistance(from, to);
 
             if (distanceOfContainers % 2 != 0) {
                 distanceOfContainers = distanceOfContainers - 1;
@@ -139,13 +132,6 @@ const ExpansionEnergyBalancer: BaseCreep = {
         Creeps.create(expansionEnergyBalancer);
     },
     run: function (creep) {
-        const from = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
-        const to = Game.getObjectById(creep.memory.targetId as Id<StructureContainer>);
-        if (from && to) {
-            const range = getCostOfMovement(from, to);
-            log(`range from ${from.pos} to ${to.pos} : ${range}`);
-        }
-
         if (creep.memory.transfering && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.transfering = false;
         }
