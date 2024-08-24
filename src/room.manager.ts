@@ -1,5 +1,6 @@
 import { RoomAnalyst } from './room.analyst';
 import { SourceManager } from './source.manager';
+import { log } from './utils';
 
 enum RoomType {
     EXPANSION,
@@ -24,12 +25,15 @@ const MY_ROOMS: MyRooms = {
 export class MyRoom {
     #room: Room;
     analyst: RoomAnalyst;
-    sourceManager: SourceManager;
+    sourceManager: SourceManager | null;
 
     constructor(room: Room) {
         this.#room = room;
         this.analyst = new RoomAnalyst(this);
-        this.sourceManager = new SourceManager(room);
+        // log(`====== Room ${room.name} ======`); 
+        // log(this.analyst.sourceContainerSpots);
+        // log(`=====================`); 
+        this.sourceManager = room.name == 'E18S28' ? null : new SourceManager(room);
     }
 
     get name() {
@@ -72,12 +76,6 @@ function itsMyRoom(room: Room) {
 
 export class RoomManager {
     static start() {
-        _.forEach(Game.rooms, room => {
-            if (MY_ROOMS[room.name].type == RoomType.MAIN) {
-                return;
-            }
-
-            itsMyRoom(room) && new MyRoom(room);
-        });
+        _.forEach(Game.rooms, room => itsMyRoom(room) && new MyRoom(room));
     }
 }

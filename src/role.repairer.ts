@@ -56,6 +56,9 @@ const Repairer: BaseCreep = {
                         if (structure.structureType === STRUCTURE_WALL) {
                             return structure.hits < 1000000;
                         }
+                        if (structure.structureType === STRUCTURE_RAMPART) {
+                            return structure.hits < 2000000;
+                        }
                         return structure.hits < structure.hitsMax;
                     }
                 });

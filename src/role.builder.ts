@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import Creeps, { BaseCreep, CreepRole } from './creep';
 
-const BUILDERS = 1;
+const BUILDERS = 2;
 
 function nothingToBuild() {
     return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES).length == 0;
@@ -16,7 +16,7 @@ const Builder: BaseCreep = {
             return;
         }
         const builder = {
-            actions: [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+            actions: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
             name: `Builder${builderCount + 1}`,
             spawn: 'Spawn1',
             opts: {
