@@ -2,7 +2,19 @@ import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 
-export const EXPANSION_REPAIRERS = 1;
+export const EXPANSION_REPAIRERS = 0;
+
+const NON_BLOCKING_POSITION: Record<string, number[]> = {
+    E18S27: [15, 32]
+};
+
+function nothingToRepair(room: Room) {
+    return (
+        room.find(FIND_STRUCTURES, {
+            filter: structure => structure.hits < structure.hitsMax
+        }).length == 0
+    );
+}
 
 function repair(creep: Creep) {
     const priorityStructures = creep.room.find(FIND_STRUCTURES, {
@@ -31,6 +43,11 @@ function repair(creep: Creep) {
             if (creep.repair(nonPriorityStructures[0]) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(nonPriorityStructures[0], { visualizePathStyle: { stroke: '#ffaa00' } });
             }
+        } else {
+            // If nothing to repair move to a non blocking position
+            const [x, y] = NON_BLOCKING_POSITION[creep.room.name];
+            const nonBlockingPos = new RoomPosition(x, y, creep.room.name);
+            creep.moveTo(nonBlockingPos);
         }
     }
 }
@@ -39,7 +56,7 @@ const ExpansionRepairer: BaseCreep = {
     role: CreepRole.EXPANSION_REPAIRER,
     spawn: function () {
         const expansionRepairerCount = Creeps.count(CreepRole.EXPANSION_REPAIRER);
-        if (expansionRepairerCount >= EXPANSION_REPAIRERS) {
+        if (nothingToRepair(Game.rooms['E18S27']) || expansionRepairerCount >= EXPANSION_REPAIRERS) {
             return;
         }
 

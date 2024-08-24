@@ -3,7 +3,55 @@ import _ from 'lodash';
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 import { log } from './utils';
 
-export const EXPANSION_ENERGY_BALANCERS = 4;
+export const EXPANSION_ENERGY_BALANCERS = 2;
+
+function getCostOfMovement(from: Structure, to: Structure) {
+    return from.pos.getRangeTo(to.pos);
+}
+
+function getUnusedSourceContainer(room: Room) {
+    const otherEnergyBalancer = _.find(
+        Game.creeps,
+        balancer => balancer.memory.role == CreepRole.EXPANSION_ENERGY_BALANCER
+    );
+
+    const sourceContainers = _.map(room.memory.sources, sourceId => {
+        const source = Game.getObjectById(sourceId as Id<Source>);
+        if (!source) {
+            return;
+        }
+
+        const container = source.pos.findInRange(FIND_STRUCTURES, 2, {
+            filter: s => s.structureType == STRUCTURE_CONTAINER
+        });
+
+        return container[0]?.id;
+    });
+
+    const nonUsedContainerId = _.find(
+        sourceContainers,
+        containerId => containerId != otherEnergyBalancer?.memory.containerId
+    );
+
+    return nonUsedContainerId;
+}
+
+function getControllerContainer(room: Room) {
+    const controller = room.controller?.pos;
+    if (!controller) {
+        return;
+    }
+
+    const containersInRange = controller.findInRange(FIND_STRUCTURES, 3, {
+        filter: structure => structure.structureType == STRUCTURE_CONTAINER
+    });
+
+    if (containersInRange.length == 0) {
+        return;
+    }
+
+    return containersInRange[0].id;
+}
 
 function transfer(creep: Creep) {
     const spawn = Creeps.get(creep).spawn();
@@ -14,10 +62,6 @@ function transfer(creep: Creep) {
         (spawn[0]?.store.getCapacity(RESOURCE_ENERGY) ?? 0) +
         extensions.reduce((acc, curr) => acc + curr.store.getCapacity(RESOURCE_ENERGY), 0);
 
-    log(`spawnEnergy ${spawnEnergy}`);
-    log(`spawnEnergyCapactity ${spawnEnergyCapactity}`);
-    const r = Math.floor((spawnEnergy / spawnEnergyCapactity) * 100);
-    log(`energy percentage at base ${r}%`);
     if (Math.floor((spawnEnergy / spawnEnergyCapactity) * 100) < 80) {
         const extensionsFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
             filter: (structure: AnyStructure) =>
@@ -33,12 +77,12 @@ function transfer(creep: Creep) {
         filter: (structure: AnyStructure) =>
             structure.structureType == STRUCTURE_TOWER &&
             structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
-            Math.floor(structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY) * 100) < 80
+            Math.floor((structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY)) * 100) < 80
     };
     const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
     if (closestTower) {
         log(
-            `energy percentage at tower ${Math.floor(closestTower.store.energy / closestTower.store.getCapacity(RESOURCE_ENERGY) * 100)}%`
+            `energy percentage at tower ${Math.floor((closestTower.store.energy / closestTower.store.getCapacity(RESOURCE_ENERGY)) * 100)}%`
         );
     }
 
@@ -47,53 +91,61 @@ function transfer(creep: Creep) {
         return;
     }
 
-    // check if target is stored in mem
-    if (creep.memory.targetId) {
-        const container = Game.getObjectById(creep.memory.targetId as Id<StructureContainer>);
-        if (container && creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
-        }
-
-        return;
+    const container = Game.getObjectById(creep.memory.targetId as Id<StructureContainer>);
+    if (container && creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
     }
-
-    const controller = creep.room.controller?.pos;
-    if (!controller) {
-        return;
-    }
-
-    const containersInRange = controller.findInRange(FIND_STRUCTURES, 3, {
-        filter: structure => structure.structureType == STRUCTURE_CONTAINER
-    });
-
-    if (containersInRange.length == 0) {
-        return;
-    }
-
-    creep.memory.targetId = containersInRange[0].id;
 }
 
 const ExpansionEnergyBalancer: BaseCreep = {
     role: CreepRole.EXPANSION_ENERGY_BALANCER,
     spawn: function () {
+        const room = Game.rooms['E18S27'];
         const expansionEnergyBalancerCount = Creeps.count(CreepRole.EXPANSION_ENERGY_BALANCER);
         if (expansionEnergyBalancerCount >= EXPANSION_ENERGY_BALANCERS) {
             return;
         }
 
+        const containerId = getUnusedSourceContainer(room);
+        const targetId = getControllerContainer(room);
+
+        const from = Game.getObjectById(containerId as Id<StructureContainer>);
+        const to = Game.getObjectById(targetId as Id<StructureContainer>);
+
+        let distanceOfContainers = 5;
+
+        if (from && to) {
+            distanceOfContainers = getCostOfMovement(from, to);
+
+            if (distanceOfContainers % 2 != 0) {
+                distanceOfContainers = distanceOfContainers - 1;
+            }
+
+            distanceOfContainers = distanceOfContainers / 2;
+        }
+
         const expansionEnergyBalancer = {
-            actions: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE],
+            actions: [...Array(distanceOfContainers).fill(CARRY), ...Array(distanceOfContainers / 2).fill(MOVE)],
             name: `ExpansionEnergyBalancer${expansionEnergyBalancerCount + 1}`,
             spawn: 'Spawn2',
             opts: {
                 memory: {
-                    role: CreepRole.EXPANSION_ENERGY_BALANCER
+                    role: CreepRole.EXPANSION_ENERGY_BALANCER,
+                    containerId: getUnusedSourceContainer(room),
+                    targetId: getControllerContainer(room)
                 }
             }
         };
         Creeps.create(expansionEnergyBalancer);
     },
     run: function (creep) {
+        const from = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
+        const to = Game.getObjectById(creep.memory.targetId as Id<StructureContainer>);
+        if (from && to) {
+            const range = getCostOfMovement(from, to);
+            log(`range from ${from.pos} to ${to.pos} : ${range}`);
+        }
+
         if (creep.memory.transfering && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.transfering = false;
         }
@@ -102,24 +154,7 @@ const ExpansionEnergyBalancer: BaseCreep = {
         }
 
         if (creep.store.energy === 0 || (!creep.memory.transfering && creep.store.getFreeCapacity() > 0)) {
-            const containers = creep.room
-                .find<StructureContainer>(FIND_STRUCTURES, {
-                    filter: structure =>
-                        structure.structureType == STRUCTURE_CONTAINER &&
-                        structure.id != creep.memory.targetId &&
-                        structure.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)
-                })
-                .sort((sA, sB) => {
-                    if (sB.store.energy > sA.store.energy) {
-                        return 1;
-                    } else if (sA.store.energy > sB.store.energy) {
-                        return -1;
-                    }
-                    return 0;
-                });
-
-            const container = _.first(containers);
-
+            const container = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
             if (container) {
                 if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });

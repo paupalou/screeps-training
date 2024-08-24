@@ -14,7 +14,7 @@ export class ExpansionHarvester extends Creep {
             creep.say('🫳 store');
         }
 
-        let workSpot = creep.memory.workSpot;
+        const workSpot = creep.memory.workSpot;
 
         if (creep.memory.transfering) {
             const containerCoords = creep.room.memory.containerBestSpots[creep.memory.sourceId];
@@ -23,7 +23,7 @@ export class ExpansionHarvester extends Creep {
                 containerCoords[1],
                 creep.room.name
             );
-            // log(containerPos);
+
             const positionStructures = containerPos.lookFor(LOOK_STRUCTURES);
             const container = _.find(positionStructures, structure => structure.structureType == STRUCTURE_CONTAINER);
             if (container) {
