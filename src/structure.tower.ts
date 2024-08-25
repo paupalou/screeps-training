@@ -19,7 +19,7 @@ const Tower = {
                     (struc.structureType === STRUCTURE_RAMPART && struc.hits < 500000)
             });
 
-            if (closestDamagedStructure) {
+            if (tower.store.energy > 500 && closestDamagedStructure) {
                 tower.repair(closestDamagedStructure);
             } else {
                 const closestDamagedWall = tower.pos.findClosestByRange(FIND_STRUCTURES, {

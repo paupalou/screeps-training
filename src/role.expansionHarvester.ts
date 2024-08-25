@@ -1,11 +1,7 @@
-import _ from 'lodash';
-
 import { CreepRole } from './creep';
-import { log } from './utils';
 
-export class ExpansionHarvester extends Creep {
-    run() {
-        const creep = this;
+export default {
+    work(creep: Creep) {
         if (creep.memory.transfering && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.transfering = false;
             creep.say('⛏️ harvest');
@@ -61,6 +57,4 @@ export class ExpansionHarvester extends Creep {
             source && creep.harvest(source);
         }
     }
-}
-
-export default ExpansionHarvester;
+};

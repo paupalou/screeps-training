@@ -3,17 +3,17 @@ import ExpansionHarvester from './role.expansionHarvester';
 
 export class SourceManager {
     #room: Room;
-    harvesters: ExpansionHarvester[];
 
     constructor(room: Room) {
         this.#room = room;
+        this.run();
+    }
 
-        this.harvesters = _.filter(
+    get harvesters() {
+        return _.filter(
             Game.creeps,
             creep => creep.memory.role == CreepRole.EXPANSION_HARVESTER && creep.room.name == this.#room.name
-        ).map(creep => new ExpansionHarvester(creep.id));
-
-        this.run();
+        );
     }
 
     get sources() {
@@ -41,8 +41,9 @@ export class SourceManager {
             return;
         }
 
+        const actions = [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE];
         const expansionHarvester = {
-            actions: [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE],
+            actions,
             name: `ExpansionHarvester${this.harvesters.length + 1}`,
             spawn: spawn.name,
             opts: {
@@ -62,7 +63,7 @@ export class SourceManager {
         }
 
         _.forEach(this.harvesters, harvester => {
-            harvester.run();
+            ExpansionHarvester.work(harvester);
         });
     }
 }

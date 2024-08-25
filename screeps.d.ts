@@ -19,4 +19,10 @@ declare global {
     interface Memory {
         [key: string]: any;
     }
+
+    interface Room extends Room {
+        spawn: StructureSpawn;
+        unfinishedSpawn: StructureSpawn;
+        sources: Source[];
+    }
 }

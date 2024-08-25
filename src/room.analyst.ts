@@ -1,4 +1,3 @@
-import { MyRoom } from './room.manager';
 import { RoomMap } from './room.map';
 import { getAdjacentPositions } from './utils';
 
@@ -9,8 +8,8 @@ interface SourceSpots {
 interface ContainerSpots extends SourceSpots {}
 
 export class RoomAnalyst {
-    #room: MyRoom;
-    constructor(room: MyRoom) {
+    #room: Room;
+    constructor(room: Room) {
         this.#room = room;
     }
 

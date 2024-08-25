@@ -14,6 +14,7 @@ import ExpansionEnergyBalancer from './role.expansionEnergyBalancer';
 import ExpansionRepairer from './role.expansionRepairer';
 import ExpansionUpgrader from './role.expansionUpgrader';
 import Profiler from './profiler';
+import './prototypes';
 
 const PROFILE = true;
 
@@ -32,10 +33,10 @@ function respawnCreeps() {
 
     Upgrader.spawn();
     Builder.spawn();
-    Repairer.spawn();
-    Stealer.spawn();
-    Claimer.spawn();
-    Invader.spawn();
+    // Repairer.spawn();
+    // Stealer.spawn();
+    // Claimer.spawn();
+    // Invader.spawn();
 
     // Expansion
     ExpansionUpgrader.spawn();

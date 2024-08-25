@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
+import { byLessEnergy, byMostEnergy } from './sort';
 
 export const TRANSPORTERS = 2;
 
@@ -19,15 +20,6 @@ function getControllerContainer(room: Room) {
     }
 
     return containersInRange[0].id;
-}
-
-function byMostEnergy(containerA: StructureContainer, containerB: StructureContainer) {
-    if (containerB.store.energy > containerA.store.energy) {
-        return 1;
-    } else if (containerA.store.energy > containerB.store.energy) {
-        return -1;
-    }
-    return 0;
 }
 
 function almostFullContainer(creep: Creep) {
@@ -75,36 +67,41 @@ function storeResources(creep: Creep) {
     const spawnEnergyCapactity =
         (spawn[0]?.store.getCapacity(RESOURCE_ENERGY) ?? 0) +
         extensions.reduce((acc, curr) => acc + curr.store.getCapacity(RESOURCE_ENERGY), 0);
-
-    if (Math.floor((spawnEnergy / spawnEnergyCapactity) * 100) < 80) {
         const extensionsFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
             filter: (structure: AnyStructure) =>
                 structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
         };
-        const closest = creep.pos.findClosestByPath([...spawn, ...Creeps.get(creep).spawnExtensions(extensionsFilter)]);
-        Creeps.transfer(creep).to(closest);
+        const closestExtensionOrSpawn = creep.pos.findClosestByPath([...spawn, ...Creeps.get(creep).spawnExtensions(extensionsFilter)]);
+
+    if (Math.floor((spawnEnergy / spawnEnergyCapactity) * 100) < 40) {
+        Creeps.transfer(creep).to(closestExtensionOrSpawn);
         return;
     }
 
     // towers
-    const towersFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
-        filter: (structure: AnyStructure) =>
-            structure.structureType == STRUCTURE_TOWER &&
-            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
-            Math.floor((structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY)) * 100) < 80
-    };
-    const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
-    if (closestTower) {
-        Creeps.transfer(creep).to(closestTower);
+    const towers = creep.room
+        .find<StructureTower>(FIND_STRUCTURES, {
+            filter: (structure: AnyStructure) =>
+                structure.structureType == STRUCTURE_TOWER &&
+                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
+                Math.floor((structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY)) * 100) < 80
+        })
+        .sort(byLessEnergy);
+
+    if (towers.length) {
+        Creeps.transfer(creep).to(towers[0]);
         return;
     }
 
-    // just in case spawn , extensions and tower are full transfer to controller container
-    const controllerContainer = Game.getObjectById(getControllerContainer(creep.room) as Id<StructureContainer>);
+    // fill extension or spawn if towers are almost full
+    Creeps.transfer(creep).to(closestExtensionOrSpawn);
 
-    if (controllerContainer && creep.transfer(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(controllerContainer, { visualizePathStyle: { stroke: '#ffaa00' } });
-    }
+    // just in case spawn , extensions and tower are full transfer to controller container
+    // const controllerContainer = Game.getObjectById(getControllerContainer(creep.room) as Id<StructureContainer>);
+    //
+    // if (controllerContainer && creep.transfer(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+    //     creep.moveTo(controllerContainer, { visualizePathStyle: { stroke: '#ffaa00' } });
+    // }
 }
 
 const Transporter: BaseCreep = {
@@ -138,7 +135,8 @@ const Transporter: BaseCreep = {
         if (creep.memory.transporting) {
             storeResources(creep);
         } else {
-            withdrawResources(creep, almostFullContainer(creep));
+            const topContainer = Game.getObjectById('66cb141f9d107301af33c924' as Id<StructureContainer>);
+            topContainer && withdrawResources(creep, topContainer);
         }
     }
 };
