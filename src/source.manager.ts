@@ -28,7 +28,7 @@ export class SourceManager {
     }
 
     get #needSpawnHarvester() {
-        return this.harvesters.length < this.sources.length;
+        return this.harvesters.filter(harvester => harvester.ticksToLive ?? 0 < 15).length < this.sources.length;
     }
 
     spawnHarvester() {
