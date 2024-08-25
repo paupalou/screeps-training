@@ -2,7 +2,33 @@ import _ from 'lodash';
 
 import Creeps, { type BaseCreep, CreepRole } from './creep';
 
-export const TRANSPORTERS = 3;
+export const TRANSPORTERS = 2;
+
+function getControllerContainer(room: Room) {
+    const controller = room.controller?.pos;
+    if (!controller) {
+        return;
+    }
+
+    const containersInRange = controller.findInRange(FIND_STRUCTURES, 3, {
+        filter: structure => structure.structureType == STRUCTURE_CONTAINER
+    });
+
+    if (containersInRange.length == 0) {
+        return;
+    }
+
+    return containersInRange[0].id;
+}
+
+function byMostEnergy(containerA: StructureContainer, containerB: StructureContainer) {
+    if (containerB.store.energy > containerA.store.energy) {
+        return 1;
+    } else if (containerA.store.energy > containerB.store.energy) {
+        return -1;
+    }
+    return 0;
+}
 
 function almostFullContainer(creep: Creep) {
     // return creep.pos.findClosestByPath<StructureContainer>(FIND_STRUCTURES, {
@@ -16,14 +42,7 @@ function almostFullContainer(creep: Creep) {
                 structure.structureType == STRUCTURE_CONTAINER &&
                 structure.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)
         })
-        .sort((sA, sB) => {
-            if (sB.store.energy > sA.store.energy) {
-                return 1;
-            } else if (sA.store.energy > sB.store.energy) {
-                return -1;
-            }
-            return 0;
-        });
+        .sort(byMostEnergy);
 
     return _.first(containers);
 }
@@ -78,6 +97,13 @@ function storeResources(creep: Creep) {
     if (closestTower) {
         Creeps.transfer(creep).to(closestTower);
         return;
+    }
+
+    // just in case spawn , extensions and tower are full transfer to controller container
+    const controllerContainer = Game.getObjectById(getControllerContainer(creep.room) as Id<StructureContainer>);
+
+    if (controllerContainer && creep.transfer(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(controllerContainer, { visualizePathStyle: { stroke: '#ffaa00' } });
     }
 }
 
