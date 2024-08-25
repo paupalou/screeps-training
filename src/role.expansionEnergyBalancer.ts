@@ -140,10 +140,18 @@ const ExpansionEnergyBalancer: BaseCreep = {
         }
 
         if (creep.store.energy === 0 || (!creep.memory.transfering && creep.store.getFreeCapacity() > 0)) {
-            const container = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
-            if (container) {
-                if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
+            const droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
+            if (droppedEnergy) {
+                if (creep.pickup(droppedEnergy) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(droppedEnergy, { visualizePathStyle: { stroke: '#ffffff' } });
+                }
+                return;
+            } else {
+                const container = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
+                if (container) {
+                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
+                    }
                 }
             }
         } else {

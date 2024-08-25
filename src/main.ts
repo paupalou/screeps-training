@@ -24,11 +24,11 @@ function respawnCreeps() {
         return;
     }
 
-    Harvester.spawn();
-    if (Creeps.count(CreepRole.HARVESTER) < HARVESTERS) {
-        // do not create any other creep if we dont have expected harvesters alive
-        return;
-    }
+    // Harvester.spawn();
+    // if (Creeps.count(CreepRole.HARVESTER) < HARVESTERS) {
+    //     // do not create any other creep if we dont have expected harvesters alive
+    //     return;
+    // }
 
     Upgrader.spawn();
     Builder.spawn();

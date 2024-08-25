@@ -32,17 +32,26 @@ export class SourceManager {
     }
 
     spawnHarvester() {
+        const spawn = _.first(
+            this.#room.find(FIND_MY_STRUCTURES, {
+                filter: structure => structure.structureType == STRUCTURE_SPAWN
+            })
+        );
+        if (!spawn) {
+            return;
+        }
+
         const expansionHarvester = {
             actions: [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE],
             name: `ExpansionHarvester${this.harvesters.length + 1}`,
-            spawn: 'Spawn2',
+            spawn: spawn.name,
             opts: {
                 memory: {
                     role: CreepRole.EXPANSION_HARVESTER
                 }
             }
         };
-        if (!Game.spawns['Spawn2'].spawning) {
+        if (!spawn.spawning) {
             Creeps.create(expansionHarvester);
         }
     }

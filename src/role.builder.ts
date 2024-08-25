@@ -2,24 +2,33 @@ import _ from 'lodash';
 
 import Creeps, { BaseCreep, CreepRole } from './creep';
 
-const BUILDERS = 1;
+const BUILDERS = 2;
 
 function nothingToBuild() {
     return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES).length == 0;
 }
 
+const DISMANTLE_TARGET = '66c46950cb7941730df11d52';
+const ENERGY_FROM = '66cb141f9d107301af33c924';
+
 function dismantle(creep: Creep) {
-    const container = Game.getObjectById('66c0c80069234a10ee2015f6' as Id<StructureContainer>);
-    if (container) {
-        if (creep.dismantle(container) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
+    const structure = Game.getObjectById(DISMANTLE_TARGET as Id<Structure>);
+    if (structure) {
+        if (creep.dismantle(structure) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(structure, { visualizePathStyle: { stroke: '#ffffff' } });
         }
     } else {
-        const source = Game.getObjectById('5bbcae009099fc012e63846e' as Id<Source>);
-        if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
+        const container = Game.getObjectById(ENERGY_FROM as Id<StructureContainer>);
+        if (container && creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
         }
     }
+    // } else {
+    //     const source = Game.getObjectById('5bbcae009099fc012e63846e' as Id<Source>);
+    //     if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
+    //         creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
+    //     }
+    // }
 }
 
 function withdrawResources(creep: Creep) {
@@ -62,7 +71,10 @@ const Builder: BaseCreep = {
     role: CreepRole.BUILDER,
     spawn: function () {
         const builderCount = Creeps.count(CreepRole.BUILDER);
-        if (nothingToBuild() || builderCount >= BUILDERS) {
+        // if (nothingToBuild() || builderCount >= BUILDERS) {
+        //     return;
+        // }
+        if (builderCount >= BUILDERS) {
             return;
         }
         const builder = {
@@ -88,16 +100,32 @@ const Builder: BaseCreep = {
         }
 
         if (creep.memory.building) {
+            // if (!creep.memory.containerId) {
+            //     const containerId = creep.pos.findInRange<StructureContainer>(FIND_STRUCTURES, 6, {
+            //         filter: s => s.structureType == STRUCTURE_CONTAINER && s.id != DISMANTLE_TARGET
+            //     });
+            //     console.log(containerId)
+            //     if (containerId.length) {
+            //         creep.memory.containerId = _.first(containerId)?.id;
+            //     }
+            // }
             const constructionSites = Creeps.get(creep).constructionSites();
             if (constructionSites && constructionSites.length) {
                 if (creep.build(constructionSites[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(constructionSites[0], { visualizePathStyle: { stroke: '#ffffff' } });
                 }
-            } else {
-                // if there is nothing to build then conver to repairer
-                creep.memory.role = 'repairer';
             }
+            // const container = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
+            // if (container) {
+            //     if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            //         creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
+            //     }
+            // }
         } else {
+            // const source = Game.getObjectById('5bbcae009099fc012e638470' as Id<Source>);
+            // if (source && creep.harvest(source) == ERR_NOT_IN_RANGE) {
+            //     creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
+            // }
             dismantle(creep);
             // withdrawResources(creep);
         }

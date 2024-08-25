@@ -1,4 +1,4 @@
-const IGNORE_TARGETS = ['66c0c80069234a10ee2015f6'];
+const IGNORE_TARGETS = ['66c46950cb7941730df11d52']
 
 const Tower = {
     run: function (room: Room) {

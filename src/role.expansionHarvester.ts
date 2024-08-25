@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import { CreepRole } from './creep';
+import { log } from './utils';
 
 export class ExpansionHarvester extends Creep {
     run() {
@@ -26,8 +27,16 @@ export class ExpansionHarvester extends Creep {
 
             const positionStructures = containerPos.lookFor(LOOK_STRUCTURES);
             const container = _.find(positionStructures, structure => structure.structureType == STRUCTURE_CONTAINER);
+            // if (!container) {
+            //   _.forEach(positionStructures, (c) => {
+            //       log(`no container in ${c.pos.x},${c.pos.y}`)
+            //   })
+            // }
             if (container) {
-                creep.transfer(container, RESOURCE_ENERGY);
+                const transferAction = creep.transfer(container, RESOURCE_ENERGY);
+                if (transferAction == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(container);
+                }
             }
         } else if (workSpot && (creep.pos.x != workSpot[0] || creep.pos.y != workSpot[1])) {
             creep.moveTo(workSpot[0], workSpot[1], { visualizePathStyle: { stroke: '#ffaa00' } });
@@ -35,7 +44,9 @@ export class ExpansionHarvester extends Creep {
             const otherHarvester = _.find(
                 Game.creeps,
                 otherHarvester =>
-                    otherHarvester.memory.role == CreepRole.EXPANSION_HARVESTER && otherHarvester.id != creep.id
+                    otherHarvester.room.name == creep.room.name &&
+                    otherHarvester.memory.role == CreepRole.EXPANSION_HARVESTER &&
+                    otherHarvester.id != creep.id
             );
             const nonUsedSourceId = _.find(
                 Object.keys(creep.room.memory.harvestSpots),

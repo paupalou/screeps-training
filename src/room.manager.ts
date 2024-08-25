@@ -30,10 +30,10 @@ export class MyRoom {
     constructor(room: Room) {
         this.#room = room;
         this.analyst = new RoomAnalyst(this);
-        log(`====== Room ${room.name} ======`); 
-        log(this.analyst.sourceContainerSpots);
-        log(`=====================`); 
-        this.sourceManager = room.name == 'E18S28' ? null : new SourceManager(room);
+        // log(`====== Room ${room.name} ======`); 
+        // log(this.analyst.sourceContainerSpots);
+        // log(`=====================`); 
+        this.sourceManager = new SourceManager(room);
     }
 
     get name() {
