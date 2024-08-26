@@ -1,4 +1,5 @@
-import { log } from "./utils";
+import { byMoreDamaged } from './sort';
+import { log } from './utils';
 
 const IGNORE_TARGETS = ['66c46950cb7941730df11d52'];
 
@@ -11,7 +12,7 @@ const Tower = {
                 return;
             }
 
-            const closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+            const damagedStructures = tower.room.find(FIND_STRUCTURES, {
                 filter: struc =>
                     (!IGNORE_TARGETS.includes(struc.id) &&
                         struc.structureType !== STRUCTURE_WALL &&
@@ -19,8 +20,8 @@ const Tower = {
                         struc.hits < struc.hitsMax) ||
                     (struc.structureType === STRUCTURE_RAMPART && struc.hits < 500000)
             });
+            const closestDamagedStructure = damagedStructures.sort(byMoreDamaged)[0];
 
-            log(tower.store.energy)
             if (tower.store.energy < 500) {
                 // save 500 energy always in order to stop invaders
                 return;

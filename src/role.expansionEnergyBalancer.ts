@@ -61,7 +61,7 @@ function transfer(creep: Creep) {
         (spawn[0]?.store.getCapacity(RESOURCE_ENERGY) ?? 0) +
         extensions.reduce((acc, curr) => acc + curr.store.getCapacity(RESOURCE_ENERGY), 0);
 
-    if (Math.floor((spawnEnergy / spawnEnergyCapactity) * 100) < 80) {
+    if (Math.floor((spawnEnergy / spawnEnergyCapactity) * 100) < 50) {
         const extensionsFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
             filter: (structure: AnyStructure) =>
                 structure.structureType == STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
@@ -76,7 +76,7 @@ function transfer(creep: Creep) {
         filter: (structure: AnyStructure) =>
             structure.structureType == STRUCTURE_TOWER &&
             structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
-            Math.floor((structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY)) * 100) < 80
+            Math.floor((structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY)) * 100) < 40
     };
     const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
     if (closestTower) {

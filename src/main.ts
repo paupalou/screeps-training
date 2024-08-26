@@ -33,10 +33,10 @@ function respawnCreeps() {
 
     Upgrader.spawn();
     Builder.spawn();
-    // Repairer.spawn();
-    // Stealer.spawn();
-    // Claimer.spawn();
-    // Invader.spawn();
+    Repairer.spawn();
+    Stealer.spawn();
+    Claimer.spawn();
+    Invader.spawn();
 
     // Expansion
     ExpansionUpgrader.spawn();

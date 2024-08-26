@@ -40,7 +40,7 @@ function almostFullContainer(creep: Creep) {
     return _.first(containers);
 }
 
-function withdrawResources(creep: Creep, target: StructureContainer | undefined) {
+function withdrawResources(creep: Creep, target: StructureContainer | StructureStorage | undefined) {
     const droppedResources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
     if (droppedResources) {
         if (creep.pickup(droppedResources) == ERR_NOT_IN_RANGE) {
@@ -157,6 +157,7 @@ const Transporter: BaseCreep = {
         } else {
             const topContainer = Game.getObjectById('66cb141f9d107301af33c924' as Id<StructureContainer>);
             topContainer && withdrawResources(creep, topContainer);
+            // creep.room.storage && withdrawResources(creep, creep.room.storage);
         }
     }
 };

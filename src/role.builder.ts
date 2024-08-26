@@ -13,14 +13,23 @@ const ENERGY_FROM = '66cb141f9d107301af33c924';
 
 function dismantle(creep: Creep) {
     const structure = Game.getObjectById(DISMANTLE_TARGET as Id<Structure>);
+    const storage = creep.room.storage;
+
     if (structure) {
         if (creep.dismantle(structure) == ERR_NOT_IN_RANGE) {
             creep.moveTo(structure, { visualizePathStyle: { stroke: '#ffffff' } });
         }
+    } else if (storage && storage.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
+        if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(storage, { visualizePathStyle: { stroke: '#ffaa00' } });
+        }
     } else {
-        const container = Game.getObjectById(ENERGY_FROM as Id<StructureContainer>);
-        if (container && creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
+        const closestContainer = creep.closestContainer;
+        if (!closestContainer || closestContainer.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
+            return;
+        }
+        if (creep.withdraw(closestContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(closestContainer, { visualizePathStyle: { stroke: '#ffaa00' } });
         }
     }
     // } else {

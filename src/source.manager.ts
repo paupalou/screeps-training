@@ -2,38 +2,33 @@ import Creeps, { CreepRole } from './creep';
 import ExpansionHarvester from './role.expansionHarvester';
 
 export class SourceManager {
-    #room: Room;
+    static work(room: Room) {
+        if (SourceManager.needSpawnHarvester(room)) {
+            SourceManager.spawnHarvester(room);
+        }
 
-    constructor(room: Room) {
-        this.#room = room;
-        this.run();
+        _.forEach(SourceManager.harvesters(room), harvester => {
+            ExpansionHarvester.work(harvester);
+        });
     }
 
-    get harvesters() {
+    static harvesters(room: Room) {
         return _.filter(
             Game.creeps,
-            creep => creep.memory.role == CreepRole.EXPANSION_HARVESTER && creep.room.name == this.#room.name
+            creep => creep.memory.role == CreepRole.EXPANSION_HARVESTER && creep.room.name == room.name
         );
     }
 
-    get sources() {
-        const storedSources: string[] | undefined = this.#room.memory.sources;
-        if (storedSources) {
-            return _.map(storedSources, sourceId => Game.getObjectById<Source>(sourceId as Id<Source>));
-        }
-
-        const roomSources = _.map(this.#room.find(FIND_SOURCES), source => source.id);
-        this.#room.memory.sources = roomSources;
-        return _.map(roomSources, sourceId => Game.getObjectById<Source>(sourceId as Id<Source>));
+    static needSpawnHarvester(room: Room) {
+        return (
+            SourceManager.harvesters(room).filter(harvester => harvester.ticksToLive ?? 0 < 15).length <
+            room.sources.length
+        );
     }
 
-    get #needSpawnHarvester() {
-        return this.harvesters.filter(harvester => harvester.ticksToLive ?? 0 < 15).length < this.sources.length;
-    }
-
-    spawnHarvester() {
+    static spawnHarvester(room: Room) {
         const spawn = _.first(
-            this.#room.find(FIND_MY_STRUCTURES, {
+            room.find(FIND_MY_STRUCTURES, {
                 filter: structure => structure.structureType == STRUCTURE_SPAWN
             })
         );
@@ -44,7 +39,7 @@ export class SourceManager {
         const actions = [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE];
         const expansionHarvester = {
             actions,
-            name: `ExpansionHarvester${this.harvesters.length + 1}`,
+            name: `ExpansionHarvester${SourceManager.harvesters(room).length + 1}`,
             spawn: spawn.name,
             opts: {
                 memory: {
@@ -55,15 +50,5 @@ export class SourceManager {
         if (!spawn.spawning) {
             Creeps.create(expansionHarvester);
         }
-    }
-
-    run() {
-        if (this.#needSpawnHarvester) {
-            this.spawnHarvester();
-        }
-
-        _.forEach(this.harvesters, harvester => {
-            ExpansionHarvester.work(harvester);
-        });
     }
 }
