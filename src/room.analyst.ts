@@ -1,34 +1,28 @@
 import { RoomMap } from './room.map';
 import { getAdjacentPositions } from './utils';
 
-interface SourceSpots {
-    [key: string]: [number, number];
-}
-
-interface ContainerSpots extends SourceSpots {}
-
 export class RoomAnalyst {
-    #room: Room;
-    constructor(room: Room) {
-        this.#room = room;
+    static work(room: Room) {
+        RoomAnalyst.findBestHarvestSpots(room);
+        RoomAnalyst.findSourceContainerSpots(room);
     }
 
-    get harvestSpots(): SourceSpots {
-        const roomSources = this.#room.sources;
-        const roomSpawn = this.#room.spawn ?? this.#room.unfinishedSpawn;
+    static findBestHarvestSpots(room: Room) {
+        const roomSources = room.sources;
+        const roomSpawn = room.spawn ?? room.unfinishedSpawn;
 
         _.forEach(roomSources, source => {
             if (!source) {
                 return;
             }
 
-            let storedSpots = this.#room.memory.harvestSpots;
+            let storedSpots = room.memory.harvestSpots;
             if (storedSpots && Object.keys(storedSpots).length == roomSources.length) {
-                return this.#room.memory.harvestSpots;
+                return;
             }
 
-            const roomMap = new RoomMap(this.#room.name);
-            const miningBestSpot = getAdjacentPositions(source.pos, this.#room.name)
+            const roomMap = new RoomMap(room.name);
+            const miningBestSpot = getAdjacentPositions(source.pos, room.name)
                 .filter(adjacentSpot => roomMap.canBuildInPosition(adjacentSpot))
                 .reduce((acc, position) => {
                     if (!acc) {
@@ -46,34 +40,33 @@ export class RoomAnalyst {
                 return {};
             }
 
-            storedSpots = this.#room.memory.containerBestSpots;
+            storedSpots = room.memory.containerBestSpots;
             if (storedSpots && Object.keys(storedSpots).length) {
-                this.#room.memory.harvestSpots = {
+                room.memory.harvestSpots = {
                     ...storedSpots,
                     [source.id]: [miningBestSpot.x, miningBestSpot.y]
                 };
             } else {
-                this.#room.memory.harvestSpots = { [source.id]: [miningBestSpot.x, miningBestSpot.y] };
+                room.memory.harvestSpots = { [source.id]: [miningBestSpot.x, miningBestSpot.y] };
             }
         });
-
-        return this.#room.memory.harvestSpots;
     }
 
-    get sourceContainerSpots(): ContainerSpots {
-        const harvestSpots = this.harvestSpots;
+    static findSourceContainerSpots(room: Room) {
+        RoomAnalyst.findBestHarvestSpots(room);
+        const harvestSpots = room.memory.harvestSpots;
 
-        let storedSpots = this.#room.memory.containerSpots;
+        let storedSpots = room.memory.containerSpots;
         if (storedSpots && harvestSpots && Object.keys(storedSpots).length == Object.keys(harvestSpots).length) {
-            return this.#room.memory.containerSpots;
+            return;
         }
 
-        const roomSpawn = this.#room.spawn ?? this.#room.unfinishedSpawn;
+        const roomSpawn = room.spawn ?? room.unfinishedSpawn;
         _.forEach(Object.keys(harvestSpots), sourceId => {
-            const roomMap = new RoomMap(this.#room.name);
+            const roomMap = new RoomMap(room.name);
             const [x, y] = harvestSpots[sourceId];
-            const spotPosition = new RoomPosition(x, y, this.#room.name);
-            const containerBestSpot = getAdjacentPositions(spotPosition, this.#room.name)
+            const spotPosition = new RoomPosition(x, y, room.name);
+            const containerBestSpot = getAdjacentPositions(spotPosition, room.name)
                 .filter(adjacentSpot => roomMap.canBuildInPosition(adjacentSpot))
                 .reduce((acc, position) => {
                     if (!acc) {
@@ -91,17 +84,15 @@ export class RoomAnalyst {
                 return {};
             }
 
-            storedSpots = this.#room.memory.containerBestSpots;
+            storedSpots = room.memory.containerBestSpots;
             if (storedSpots && Object.keys(storedSpots).length) {
-                this.#room.memory.containerBestSpots = {
+                room.memory.containerBestSpots = {
                     ...storedSpots,
                     [sourceId]: [containerBestSpot.x, containerBestSpot.y]
                 };
             } else {
-                this.#room.memory.containerBestSpots = { [sourceId]: [containerBestSpot.x, containerBestSpot.y] };
+                room.memory.containerBestSpots = { [sourceId]: [containerBestSpot.x, containerBestSpot.y] };
             }
         });
-
-        return this.#room.memory.containerBestSpots;
     }
 }
