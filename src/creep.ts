@@ -33,14 +33,12 @@ function count(role: CreepRole) {
 }
 
 function transfer(creep: Creep) {
-    function to(
-        target: StructureContainer | StructureSpawn | StructureExtension | StructureTower | StructureStorage | null
-    ) {
+    function to(target: StructureContainer | StructureSpawn | StructureExtension | StructureTower | null) {
         if (!target) {
             return;
         }
 
-        log(creep.store.getUsedCapacity());
+        log(creep.store.getUsedCapacity())
         const amount =
             target.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.energy
                 ? creep.store.energy
