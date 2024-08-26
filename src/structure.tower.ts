@@ -1,3 +1,5 @@
+import { log } from "./utils";
+
 const IGNORE_TARGETS = ['66c46950cb7941730df11d52'];
 
 const Tower = {
@@ -18,6 +20,7 @@ const Tower = {
                     (struc.structureType === STRUCTURE_RAMPART && struc.hits < 500000)
             });
 
+            log(tower.store.energy)
             if (tower.store.energy < 500) {
                 // save 500 energy always in order to stop invaders
                 return;

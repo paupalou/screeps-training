@@ -25,5 +25,6 @@ declare global {
         unfinishedSpawn: StructureSpawn;
         sources: Source[];
         towers: StructureTower[];
+        storage: StructureStorage;
     }
 }

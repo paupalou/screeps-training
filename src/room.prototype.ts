@@ -17,7 +17,17 @@ Object.defineProperty(Room.prototype, 'spawn', {
 Object.defineProperty(Room.prototype, 'unfinishedSpawn', {
     get() {
         return this.find(FIND_MY_CONSTRUCTION_SITES, {
-            filter: (structure: Structure) => structure.structureType === STRUCTURE_SPAWN
+            filter: (structure: Structure) => structure.structureType == STRUCTURE_SPAWN
+        })[0];
+    },
+    enumerable: false,
+    configurable: true
+});
+
+Object.defineProperty(Room.prototype, 'storage', {
+    get() {
+        return this.find(FIND_STRUCTURES, {
+            filter: (structure: Structure) => structure.structureType == STRUCTURE_STORAGE
         })[0];
     },
     enumerable: false,
@@ -43,7 +53,7 @@ Object.defineProperty(Room.prototype, 'towers', {
     get() {
         return this.find(FIND_STRUCTURES, {
             filter: (structure: Structure) => structure.structureType === STRUCTURE_TOWER
-        })[0];
+        });
     },
     enumerable: false,
     configurable: true

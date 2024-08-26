@@ -93,8 +93,12 @@ function storeResources(creep: Creep) {
         return;
     }
 
-    // fill extension or spawn if towers are almost full
-    Creeps.transfer(creep).to(closestExtensionOrSpawn);
+    if (creep.room.storage) {
+      Creeps.transfer(creep).to(creep.room.storage);
+    } else {
+      // fill extension or spawn if towers are almost full
+      Creeps.transfer(creep).to(closestExtensionOrSpawn);
+    }
 
     // just in case spawn , extensions and tower are full transfer to controller container
     // const controllerContainer = Game.getObjectById(getControllerContainer(creep.room) as Id<StructureContainer>);
