@@ -32,18 +32,28 @@ function count(role: CreepRole) {
     return getByRole(role).length;
 }
 
-function transfer(creep: Creep) {
-    function to(target: StructureContainer | StructureSpawn | StructureExtension | StructureTower | null) {
+function transfer(creep: Creep, resource: ResourceConstant = RESOURCE_ENERGY) {
+    function to(
+        target: StructureContainer | StructureSpawn | StructureExtension | StructureTower | StructureStorage | null
+    ) {
         if (!target) {
             return;
         }
 
-        log(creep.store.getUsedCapacity())
-        const amount =
-            target.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.energy
-                ? creep.store.energy
-                : target.store.getFreeCapacity(RESOURCE_ENERGY);
-        const result = creep.transfer(target, RESOURCE_ENERGY, amount);
+        let amount;
+        if (target.structureType == STRUCTURE_CONTAINER || target.structureType == STRUCTURE_STORAGE) {
+            amount =
+                target.store.getFreeCapacity(resource) > creep.store[resource]
+                    ? creep.store[resource]
+                    : target.store.getFreeCapacity(resource);
+        } else {
+            amount =
+                target.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.energy
+                    ? creep.store.energy
+                    : target.store.getFreeCapacity(RESOURCE_ENERGY);
+        }
+
+        const result = creep.transfer(target, resource, amount);
         if (result == ERR_NOT_IN_RANGE) {
             creep.moveTo(target, { visualizePathStyle: { stroke: '#ffffff' } });
         }

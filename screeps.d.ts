@@ -20,6 +20,10 @@ declare global {
         [key: string]: any;
     }
 
+    interface Creep extends Creep {
+        closestContainer: StructureContainer;
+    }
+
     interface Room extends Room {
         spawn: StructureSpawn;
         unfinishedSpawn: StructureSpawn;
