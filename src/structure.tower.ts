@@ -1,9 +1,8 @@
-const IGNORE_TARGETS = ['66c46950cb7941730df11d52']
+const IGNORE_TARGETS = ['66c46950cb7941730df11d52'];
 
 const Tower = {
     run: function (room: Room) {
-        const towers = room.find(FIND_STRUCTURES, { filter: struc => struc.structureType === STRUCTURE_TOWER });
-        towers.forEach(tower => {
+        room.towers.forEach(tower => {
             const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
             if (closestHostile) {
                 tower.attack(closestHostile);
@@ -19,7 +18,12 @@ const Tower = {
                     (struc.structureType === STRUCTURE_RAMPART && struc.hits < 500000)
             });
 
-            if (tower.store.energy > 500 && closestDamagedStructure) {
+            if (tower.store.energy < 500) {
+                // save 500 energy always in order to stop invaders
+                return;
+            }
+
+            if (closestDamagedStructure) {
                 tower.repair(closestDamagedStructure);
             } else {
                 const closestDamagedWall = tower.pos.findClosestByRange(FIND_STRUCTURES, {

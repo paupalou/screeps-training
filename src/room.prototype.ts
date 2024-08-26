@@ -38,3 +38,13 @@ Object.defineProperty(Room.prototype, 'sources', {
     enumerable: false,
     configurable: true
 });
+
+Object.defineProperty(Room.prototype, 'towers', {
+    get() {
+        return this.find(FIND_STRUCTURES, {
+            filter: (structure: Structure) => structure.structureType === STRUCTURE_TOWER
+        })[0];
+    },
+    enumerable: false,
+    configurable: true
+});
