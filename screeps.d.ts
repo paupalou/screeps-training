@@ -1,11 +1,31 @@
 import type { LoDashStatic } from 'lodash';
 
+enum CreepRole {
+    HARVESTER = 'harvester',
+    BUILDER = 'builder',
+    UPGRADER = 'upgrader',
+    REPAIRER = 'repairer',
+    TRANSPORTER = 'transporter',
+    STEALER = 'stealer',
+    CLAIMER = 'claimer',
+    INVADER = 'invader',
+    MINER = 'miner',
+    // Expansion temporal types
+    EXPANSION_BUILDER = 'expansion_builder',
+    EXPANSION_HARVESTER = 'expansion_harvester',
+    EXPANSION_ENERGY_BALANCER = 'expansion_energy_balancer',
+    EXPANSION_REPAIRER = 'expansion_repairer',
+    EXPANSION_UPGRADER = 'expansion_upgrader'
+}
+
 declare global {
     const _: LoDashStatic;
 
     interface CreepMemory {
-        [name: string]: any;
+      role: CreepRole;
+      [name: string]: any;
     }
+
     interface FlagMemory {
         [name: string]: any;
     }

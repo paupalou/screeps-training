@@ -76,7 +76,7 @@ function storeResources(creep: Creep) {
     if (
         controllerContainer &&
         controllerContainer?.store.energy < 1500 &&
-        otherRoomTransporters.length &&
+        otherTransporters.length &&
         (otherTransporters[0].ticksToLive ?? 0) > (creep.ticksToLive ?? 0)
     ) {
         if (controllerContainer && creep.transfer(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
@@ -182,7 +182,7 @@ const Transporter: BaseCreep = {
             if (
                 controllerContainer &&
                 controllerContainer?.store.energy < 1500 &&
-                otherRoomTransporters.length &&
+                otherTransporters.length &&
                 (otherTransporters[0].ticksToLive ?? 0) > (creep.ticksToLive ?? 0)
             ) {
                 withdrawResources(creep, creep.room.storage);

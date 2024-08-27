@@ -1,7 +1,17 @@
 import { CreepRole } from "./creep";
 
+interface HarvesterMemory extends CreepMemory {
+    transfering: boolean;
+    workSpot: [number, number];
+    sourceId: string;
+}
+
+export interface Harvester extends Creep {
+  memory: HarvesterMemory 
+}
+
 export default {
-    work(creep: Creep) {
+    work(creep: Harvester) {
         if (creep.memory.transfering && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.transfering = false;
             creep.say('⛏️ harvest');

@@ -1,5 +1,5 @@
 import Creeps, { CreepRole } from './creep';
-import ExpansionHarvester from './role.expansionHarvester';
+import ExpansionHarvester, { Harvester } from './role.expansionHarvester';
 
 export class SourceManager {
     static work(room: Room) {
@@ -16,7 +16,7 @@ export class SourceManager {
         return _.filter(
             Game.creeps,
             creep => creep.memory.role == CreepRole.EXPANSION_HARVESTER && creep.room.name == room.name
-        );
+        ) as Harvester[];
     }
 
     static needSpawnHarvester(room: Room) {
