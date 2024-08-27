@@ -8,7 +8,7 @@ export class RoomMap {
         return this.#terrain.get(pos.x, pos.y) == 0;
     }
 
-    public canBuildInPosition(pos: RoomPosition) {
+    public isNotWallPosition(pos: RoomPosition) {
         return this.#terrain.get(pos.x, pos.y) != TERRAIN_MASK_WALL;
     }
 }

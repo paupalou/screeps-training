@@ -1,13 +1,64 @@
 import { RoomMap } from './room.map';
-import { getAdjacentPositions } from './utils';
+import { byFarestTo } from './sort';
+import { getAdjacentPositions, log } from './utils';
 
 export class RoomAnalyst {
     static work(room: Room) {
-        RoomAnalyst.findBestHarvestSpots(room);
+        // controller
+        RoomAnalyst.findControllerUpgraderSpots(room);
+
+        // sources
+        RoomAnalyst.findBestHarvestEnergySpots(room);
         RoomAnalyst.findSourceContainerSpots(room);
+
+        // minerals
+        RoomAnalyst.findBestExtractMineralSpots(room);
     }
 
-    static findBestHarvestSpots(room: Room) {
+    static findControllerUpgraderSpots(room: Room) {
+        if (room.memory.upgraderSpots || !room.controller || !room.controller.my) {
+            return;
+        }
+
+        log(`setting controller upgrader spots for room ${room.name}`);
+
+        const controllerPosition = room.controller.pos;
+        const controllerContainer = controllerPosition.findInRange(FIND_STRUCTURES, 4, {
+            filter: s => s.structureType == STRUCTURE_CONTAINER
+        })[0];
+
+        if (!controllerContainer) {
+            return;
+        }
+
+        const upgraderPositions = getAdjacentPositions(controllerContainer.pos, room.name)
+            .filter(pos => {
+                if (new Room.Terrain(room.name).get(pos.x, pos.y) == TERRAIN_MASK_WALL) {
+                    return false;
+                }
+                const harvestSpots: [number, number][] = Object.values(room.memory.harvestSpots);
+                const collisionWithHarvestSpot = harvestSpots.some(
+                    ([spotX, spotY]) => spotX == pos.x && spotY == pos.y
+                );
+                if (collisionWithHarvestSpot) {
+                    return false;
+                }
+
+                return pos.getRangeTo(controllerPosition) <= 3;
+            })
+            .sort((posA, posB) => byFarestTo(posA, posB).spawn(room.spawn))
+            .slice(0, 3);
+
+        room.memory.upgraderSpots = upgraderPositions.map(pos => [pos.x,pos.y]);
+    }
+
+    static findBestHarvestEnergySpots(room: Room) {
+        if (room.memory.harvestSpots) {
+            return;
+        }
+
+        log(`setting harvest spots for room ${room.name}`);
+
         const roomSources = room.sources;
         const roomSpawn = room.spawn ?? room.unfinishedSpawn;
 
@@ -23,7 +74,7 @@ export class RoomAnalyst {
 
             const roomMap = new RoomMap(room.name);
             const miningBestSpot = getAdjacentPositions(source.pos, room.name)
-                .filter(adjacentSpot => roomMap.canBuildInPosition(adjacentSpot))
+                .filter(adjacentSpot => roomMap.isNotWallPosition(adjacentSpot))
                 .reduce((acc, position) => {
                     if (!acc) {
                         return position;
@@ -37,10 +88,10 @@ export class RoomAnalyst {
                 });
 
             if (!miningBestSpot) {
-                return {};
+                return;
             }
 
-            storedSpots = room.memory.containerBestSpots;
+            storedSpots = room.memory.harvestSpots;
             if (storedSpots && Object.keys(storedSpots).length) {
                 room.memory.harvestSpots = {
                     ...storedSpots,
@@ -52,8 +103,58 @@ export class RoomAnalyst {
         });
     }
 
+    static findBestExtractMineralSpots(room: Room) {
+        if (room.memory.extractSpots) {
+            return;
+        }
+
+        log(`setting mineral extract spots for room ${room.name}`);
+
+        const roomMinerals = room.minerals;
+        const roomSpawn = room.spawn ?? room.unfinishedSpawn;
+
+        _.forEach(roomMinerals, mineral => {
+            if (!mineral) {
+                return;
+            }
+
+            let storedSpots = room.memory.extractSpots;
+            if (storedSpots && Object.keys(storedSpots).length == roomMinerals.length) {
+                return;
+            }
+
+            const roomMap = new RoomMap(room.name);
+            const extractBestSpot = getAdjacentPositions(mineral.pos, room.name)
+                .filter(adjacentSpot => roomMap.isNotWallPosition(adjacentSpot))
+                .reduce((acc, position) => {
+                    if (!acc) {
+                        return position;
+                    }
+
+                    if (PathFinder.search(acc, roomSpawn.pos).cost > PathFinder.search(position, roomSpawn.pos).cost) {
+                        return position;
+                    }
+
+                    return acc;
+                });
+
+            if (!extractBestSpot) {
+                return;
+            }
+
+            storedSpots = room.memory.extracSpots;
+            if (storedSpots && Object.keys(storedSpots).length) {
+                room.memory.extractSpots = {
+                    ...storedSpots,
+                    [mineral.id]: [extractBestSpot.x, extractBestSpot.y]
+                };
+            } else {
+                room.memory.extractSpots = { [mineral.id]: [extractBestSpot.x, extractBestSpot.y] };
+            }
+        });
+    }
+
     static findSourceContainerSpots(room: Room) {
-        RoomAnalyst.findBestHarvestSpots(room);
         const harvestSpots = room.memory.harvestSpots;
 
         let storedSpots = room.memory.containerSpots;
@@ -61,13 +162,15 @@ export class RoomAnalyst {
             return;
         }
 
+        log(`setting source container spots for room ${room.name}`);
+
         const roomSpawn = room.spawn ?? room.unfinishedSpawn;
         _.forEach(Object.keys(harvestSpots), sourceId => {
             const roomMap = new RoomMap(room.name);
             const [x, y] = harvestSpots[sourceId];
             const spotPosition = new RoomPosition(x, y, room.name);
             const containerBestSpot = getAdjacentPositions(spotPosition, room.name)
-                .filter(adjacentSpot => roomMap.canBuildInPosition(adjacentSpot))
+                .filter(adjacentSpot => roomMap.isNotWallPosition(adjacentSpot))
                 .reduce((acc, position) => {
                     if (!acc) {
                         return position;
@@ -81,17 +184,17 @@ export class RoomAnalyst {
                 });
 
             if (!containerBestSpot) {
-                return {};
+                return;
             }
 
-            storedSpots = room.memory.containerBestSpots;
+            storedSpots = room.memory.containerSpots;
             if (storedSpots && Object.keys(storedSpots).length) {
-                room.memory.containerBestSpots = {
+                room.memory.containerSpots = {
                     ...storedSpots,
                     [sourceId]: [containerBestSpot.x, containerBestSpot.y]
                 };
             } else {
-                room.memory.containerBestSpots = { [sourceId]: [containerBestSpot.x, containerBestSpot.y] };
+                room.memory.containerSpots = { [sourceId]: [containerBestSpot.x, containerBestSpot.y] };
             }
         });
     }

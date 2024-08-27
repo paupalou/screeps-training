@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import Creeps, { type BaseCreep, CreepRole } from './creep';
+import Creeps, { CreepRole, type BaseCreep } from './creep';
 
 export const EXPANSION_ENERGY_BALANCERS = 2;
 

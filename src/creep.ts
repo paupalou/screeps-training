@@ -1,5 +1,4 @@
 import _ from 'lodash';
-
 import { log } from './utils';
 
 export enum CreepRole {
@@ -11,6 +10,8 @@ export enum CreepRole {
     STEALER = 'stealer',
     CLAIMER = 'claimer',
     INVADER = 'invader',
+    MINER = 'miner',
+    // Expansion temporal types
     EXPANSION_BUILDER = 'expansion_builder',
     EXPANSION_HARVESTER = 'expansion_harvester',
     EXPANSION_ENERGY_BALANCER = 'expansion_energy_balancer',
@@ -34,7 +35,14 @@ function count(role: CreepRole) {
 
 function transfer(creep: Creep, resource: ResourceConstant = RESOURCE_ENERGY) {
     function to(
-        target: StructureContainer | StructureSpawn | StructureExtension | StructureTower | StructureStorage | null
+        target:
+            | StructureContainer
+            | StructureSpawn
+            | StructureExtension
+            | StructureTower
+            | StructureStorage
+            | StructureLab
+            | null
     ) {
         if (!target) {
             return;

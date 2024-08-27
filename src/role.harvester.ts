@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import Creeps, { type BaseCreep, CreepRole } from './creep';
+import Creeps, { CreepRole, type BaseCreep } from './creep';
 
 enum RoomEnergySources {
     NORTH = '5bbcae009099fc012e63846e',

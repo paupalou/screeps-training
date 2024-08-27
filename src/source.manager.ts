@@ -21,7 +21,7 @@ export class SourceManager {
 
     static needSpawnHarvester(room: Room) {
         return (
-            SourceManager.harvesters(room).filter(harvester => harvester.ticksToLive ?? 0 < 15).length <
+            SourceManager.harvesters(room).filter(harvester => harvester.ticksToLive ?? 0 < 50).length <
             room.sources.length
         );
     }

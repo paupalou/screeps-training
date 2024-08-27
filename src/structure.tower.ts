@@ -1,5 +1,4 @@
 import { byMoreDamaged } from './sort';
-import { log } from './utils';
 
 const IGNORE_TARGETS = ['66c46950cb7941730df11d52'];
 

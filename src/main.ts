@@ -1,7 +1,7 @@
 import Creeps, { CreepRole } from './creep';
 import Towers from './structure.tower';
 import Builder from './role.builder';
-import Harvester, { HARVESTERS } from './role.harvester';
+import Harvester from './role.harvester';
 import Upgrader from './role.upgrader';
 import Repairer from './role.repairer';
 import Transporter, { TRANSPORTERS } from './role.transporter';

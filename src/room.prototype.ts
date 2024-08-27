@@ -49,6 +49,21 @@ Object.defineProperty(Room.prototype, 'sources', {
     configurable: true
 });
 
+Object.defineProperty(Room.prototype, 'minerals', {
+    get() {
+        const storedMinerals: string[] | undefined = this.memory.minerals;
+        if (storedMinerals) {
+            return _.map(storedMinerals, mineralId => Game.getObjectById(mineralId as Id<Mineral>));
+        }
+
+        const roomMinerals = _.map(this.find(FIND_MINERALS), source => source.id);
+        this.memory.minerals = roomMinerals;
+        return _.map(roomMinerals, sourceId => Game.getObjectById(sourceId as Id<Mineral>));
+    },
+    enumerable: false,
+    configurable: true
+});
+
 Object.defineProperty(Room.prototype, 'towers', {
     get() {
         return this.find(FIND_STRUCTURES, {

@@ -1,7 +1,6 @@
 import _ from 'lodash';
 
-import Creeps, { type BaseCreep, CreepRole } from './creep';
-import { log } from './utils';
+import Creeps, { CreepRole, type BaseCreep } from './creep';
 
 export const EXPANSION_UPGRADERS = 3;
 

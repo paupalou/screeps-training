@@ -28,6 +28,7 @@ declare global {
         spawn: StructureSpawn;
         unfinishedSpawn: StructureSpawn;
         sources: Source[];
+        minerals: Mineral[];
         towers: StructureTower[];
         storage: StructureStorage;
     }

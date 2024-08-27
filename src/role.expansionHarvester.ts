@@ -1,4 +1,4 @@
-import { CreepRole } from './creep';
+import { CreepRole } from "./creep";
 
 export default {
     work(creep: Creep) {
@@ -14,7 +14,7 @@ export default {
         const workSpot = creep.memory.workSpot;
 
         if (creep.memory.transfering) {
-            const containerCoords = creep.room.memory.containerBestSpots[creep.memory.sourceId];
+            const containerCoords = creep.room.memory.containerSpots[creep.memory.sourceId];
             const containerPos: RoomPosition = new RoomPosition(
                 containerCoords[0],
                 containerCoords[1],

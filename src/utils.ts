@@ -1,4 +1,4 @@
-export function log(something: unknown) {
+export function log(something: string | object) {
     if (typeof something === 'string') {
         console.log(something);
         return;

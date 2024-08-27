@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import Creeps, { type BaseCreep, CreepRole } from './creep';
+import Creeps, { CreepRole, type BaseCreep } from './creep';
 
 const MIDDLE_ROOM = 'E18S26';
 const TARGET_ROOM = 'E18S25';

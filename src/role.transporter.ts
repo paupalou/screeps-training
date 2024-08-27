@@ -1,8 +1,7 @@
 import _ from 'lodash';
 
-import Creeps, { type BaseCreep, CreepRole } from './creep';
+import Creeps, { CreepRole, type BaseCreep } from './creep';
 import { byLessEnergy, byMostEnergy } from './sort';
-import { log } from './utils';
 
 export const TRANSPORTERS = 2;
 
@@ -89,7 +88,7 @@ function storeResources(creep: Creep) {
         ...Creeps.get(creep).spawnExtensions(extensionsFilter)
     ]);
 
-    if (Math.floor((spawnEnergy / spawnEnergyCapactity) * 100) < 40) {
+    if (Math.floor((spawnEnergy / spawnEnergyCapactity) * 100) < 60) {
         Creeps.transfer(creep).to(closestExtensionOrSpawn);
         return;
     }
