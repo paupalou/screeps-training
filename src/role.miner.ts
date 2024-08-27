@@ -17,10 +17,14 @@ export default {
             const labs = creep.room.find(FIND_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_LAB
             });
-            if (labs.length) {
-                const cargo = Object.keys(creep.store) as ResourceConstant[];
+            const cargo = Object.keys(creep.store) as ResourceConstant[];
+            if (labs.length && (labs[0].store.getFreeCapacity() ?? 0) > 0) {
                 _.forEach(cargo, resource => {
                     Creeps.transfer(creep, resource).to(labs[0]);
+                });
+            } else if (creep.room.storage) {
+                _.forEach(cargo, resource => {
+                    Creeps.transfer(creep, resource).to(creep.room.storage);
                 });
             }
         } else if (workSpot && (creep.pos.x != workSpot[0] || creep.pos.y != workSpot[1])) {

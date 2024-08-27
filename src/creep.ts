@@ -42,6 +42,7 @@ function transfer(creep: Creep, resource: ResourceConstant = RESOURCE_ENERGY) {
             | StructureTower
             | StructureStorage
             | StructureLab
+            | undefined
             | null
     ) {
         if (!target) {

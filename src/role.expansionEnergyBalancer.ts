@@ -84,9 +84,16 @@ function transfer(creep: Creep) {
         return;
     }
 
+    const cargo = Object.keys(creep.store) as ResourceConstant[];
     const container = Game.getObjectById(creep.memory.targetId as Id<StructureContainer>);
-    if (container && creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
+    if (container && container.store.getFreeCapacity() < creep.store.getUsedCapacity()) {
+        _.forEach(cargo, resource => {
+            Creeps.transfer(creep, resource).to(creep.room.storage);
+        });
+    } else if (!container || container.store.getFreeCapacity() < creep.store.getUsedCapacity()) {
+        _.forEach(cargo, resource => {
+            Creeps.transfer(creep, resource).to(creep.room.storage);
+        });
     }
 }
 
