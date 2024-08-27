@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import Creeps, { CreepRole, type BaseCreep } from './creep';
+import { byLessEnergy } from './sort';
 
 export const EXPANSION_ENERGY_BALANCERS = 2;
 
@@ -72,15 +73,17 @@ function transfer(creep: Creep) {
     }
 
     // towers
-    const towersFilter: FilterOptions<FIND_STRUCTURES, StructureExtension> = {
-        filter: (structure: AnyStructure) =>
-            structure.structureType == STRUCTURE_TOWER &&
-            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
-            Math.floor((structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY)) * 100) < 40
-    };
-    const closestTower = creep.pos.findClosestByPath([...Creeps.get(creep).towers(towersFilter)]);
-    if (closestTower) {
-        Creeps.transfer(creep).to(closestTower);
+    // towers
+    const towers = creep.room
+        .find<StructureTower>(FIND_STRUCTURES, {
+            filter: (structure: AnyStructure) =>
+                structure.structureType == STRUCTURE_TOWER &&
+                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
+                Math.floor((structure.store.energy / structure.store.getCapacity(RESOURCE_ENERGY)) * 100) < 80
+        })
+        .sort(byLessEnergy);
+    if (towers.length) {
+        Creeps.transfer(creep).to(towers[0]);
         return;
     }
 

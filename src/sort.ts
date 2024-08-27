@@ -1,3 +1,5 @@
+import { log } from "./utils";
+
 export function byMostEnergy(
     structA: StructureContainer | StructureTower,
     structB: StructureContainer | StructureTower
@@ -20,8 +22,20 @@ export function byLessEnergy(strucA: StructureContainer | StructureTower, strucB
 }
 
 export function byMoreDamaged(strucA: Structure, strucB: Structure) {
-    const healthPercentageStrucA = Math.floor((strucA.hits / strucA.hitsMax) * 100);
-    const healthPercentageStrucB = Math.floor((strucB.hits / strucB.hitsMax) * 100);
+    const healthPercentageStrucA = Number(((strucA.hits / strucA.hitsMax) * 100).toFixed(2));
+    const healthPercentageStrucB = Number(((strucB.hits / strucB.hitsMax) * 100).toFixed(2));
+
+    log(`============================================================`);
+    log(`struc ${strucA.structureType} has ${healthPercentageStrucA}%`);
+    log(`struc ${strucB.structureType} has ${healthPercentageStrucB}%`);
+    log(`============================================================`);
+
+    if (strucB.structureType == STRUCTURE_RAMPART && strucB.hits > 20000) {
+      return -1;
+    } else if (strucA.structureType == STRUCTURE_RAMPART && strucA.hits > 20000) {
+      return 1;
+    }
+
     if (healthPercentageStrucA > healthPercentageStrucB) {
         return 1;
     } else if (healthPercentageStrucB > healthPercentageStrucA) {
