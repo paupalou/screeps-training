@@ -58,3 +58,16 @@ export function byFarestTo(posA: RoomPosition, posB: RoomPosition) {
         }
     };
 }
+
+export function byMoreTicksToLive(creepA: Creep, creepB: Creep) {
+    const creepAticks = creepA.ticksToLive ?? 0;
+    const creepBticks = creepB.ticksToLive ?? 0;
+
+    if (creepAticks > creepBticks) {
+      return 1;
+    } else if (creepBticks > creepAticks) {
+      return -1;
+    }
+
+    return 0;
+}

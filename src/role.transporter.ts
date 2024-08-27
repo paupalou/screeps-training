@@ -5,6 +5,16 @@ import { byLessEnergy, byMostEnergy } from './sort';
 
 export const TRANSPORTERS = 2;
 
+function otherRoomTransporters(creep: Creep) {
+    return _.filter(
+        Game.creeps,
+        otherCreep =>
+            otherCreep.id != creep.id &&
+            otherCreep.room.name == creep.room.name &&
+            otherCreep.memory.role == CreepRole.TRANSPORTER
+    );
+}
+
 function getControllerContainer(room: Room) {
     const controller = room.controller?.pos;
     if (!controller) {
@@ -60,13 +70,29 @@ function withdrawResources(creep: Creep, target: StructureContainer | StructureS
 }
 
 function storeResources(creep: Creep) {
+    const otherTransporters = otherRoomTransporters(creep);
+    const controllerContainer = Game.getObjectById(getControllerContainer(creep.room) as Id<StructureContainer>);
+
+    if (
+        controllerContainer &&
+        controllerContainer?.store.energy < 1500 &&
+        otherRoomTransporters.length &&
+        (otherTransporters[0].ticksToLive ?? 0) > (creep.ticksToLive ?? 0)
+    ) {
+        if (controllerContainer && creep.transfer(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(controllerContainer, { visualizePathStyle: { stroke: '#ffaa00' } });
+        }
+
+        return;
+    }
+
     // check if creep has some resource that is not energy
     _.filter(Object.keys(creep.store) as ResourceConstant[], resource => resource != RESOURCE_ENERGY).forEach(
         nonEnergyResource => {
             if (creep.room.storage) {
-              Creeps.transfer(creep, nonEnergyResource).to(creep.room.storage);
+                Creeps.transfer(creep, nonEnergyResource).to(creep.room.storage);
             } else {
-              Creeps.transfer(creep).to(creep.closestContainer);
+                Creeps.transfer(creep).to(creep.closestContainer);
             }
             return;
         }
@@ -114,13 +140,6 @@ function storeResources(creep: Creep) {
         // fill extension or spawn if towers are almost full
         Creeps.transfer(creep).to(closestExtensionOrSpawn);
     }
-
-    // just in case spawn , extensions and tower are full transfer to controller container
-    // const controllerContainer = Game.getObjectById(getControllerContainer(creep.room) as Id<StructureContainer>);
-    //
-    // if (controllerContainer && creep.transfer(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-    //     creep.moveTo(controllerContainer, { visualizePathStyle: { stroke: '#ffaa00' } });
-    // }
 }
 
 const Transporter: BaseCreep = {
@@ -154,9 +173,23 @@ const Transporter: BaseCreep = {
         if (creep.memory.transporting) {
             storeResources(creep);
         } else {
-            const topContainer = Game.getObjectById('66cb141f9d107301af33c924' as Id<StructureContainer>);
-            topContainer && withdrawResources(creep, topContainer);
-            // creep.room.storage && withdrawResources(creep, creep.room.storage);
+            const controllerContainer = Game.getObjectById(
+                getControllerContainer(creep.room) as Id<StructureContainer>
+            );
+
+            const otherTransporters = otherRoomTransporters(creep);
+
+            if (
+                controllerContainer &&
+                controllerContainer?.store.energy < 1500 &&
+                otherRoomTransporters.length &&
+                (otherTransporters[0].ticksToLive ?? 0) > (creep.ticksToLive ?? 0)
+            ) {
+                withdrawResources(creep, creep.room.storage);
+            } else {
+                const topContainer = Game.getObjectById('66cb141f9d107301af33c924' as Id<StructureContainer>);
+                topContainer && withdrawResources(creep, topContainer);
+            }
         }
     }
 };

@@ -53,7 +53,7 @@ function getControllerContainer(room: Room) {
     return containersInRange[0].id;
 }
 
-function transfer(creep: Creep) {
+function transferToBase(creep: Creep) {
     const spawn = Creeps.get(creep).spawn();
     const extensions = Creeps.get(creep).spawnExtensions();
 
@@ -73,7 +73,6 @@ function transfer(creep: Creep) {
     }
 
     // towers
-    // towers
     const towers = creep.room
         .find<StructureTower>(FIND_STRUCTURES, {
             filter: (structure: AnyStructure) =>
@@ -86,7 +85,9 @@ function transfer(creep: Creep) {
         Creeps.transfer(creep).to(towers[0]);
         return;
     }
+}
 
+function transferToContainerOrStorage(creep: Creep) {
     const cargo = Object.keys(creep.store) as ResourceConstant[];
     const container = Game.getObjectById(creep.memory.targetId as Id<StructureContainer>);
     _.forEach(cargo, resource => {
@@ -96,6 +97,14 @@ function transfer(creep: Creep) {
             Creeps.transfer(creep, resource).to(creep.room.storage);
         }
     });
+}
+
+function transfer(creep: Creep) {
+    if (creep.memory.containerId == '66c714833533cc2695f93d71') {
+        transferToBase(creep);
+    } else if (creep.memory.containerId == '66c7059b6b9246c58cb58be7') {
+        transferToContainerOrStorage(creep);
+    }
 }
 
 const ExpansionEnergyBalancer: BaseCreep = {
