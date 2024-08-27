@@ -1,6 +1,6 @@
 import type { LoDashStatic } from 'lodash';
 
-enum CreepRole {
+declare enum CreepRole {
     HARVESTER = 'harvester',
     BUILDER = 'builder',
     UPGRADER = 'upgrader',
@@ -12,7 +12,6 @@ enum CreepRole {
     MINER = 'miner',
     // Expansion temporal types
     EXPANSION_BUILDER = 'expansion_builder',
-    EXPANSION_HARVESTER = 'expansion_harvester',
     EXPANSION_ENERGY_BALANCER = 'expansion_energy_balancer',
     EXPANSION_REPAIRER = 'expansion_repairer',
     EXPANSION_UPGRADER = 'expansion_upgrader'
@@ -42,6 +41,7 @@ declare global {
 
     interface Creep extends Creep {
         closestContainer: StructureContainer;
+        isFull: boolean;
     }
 
     interface Room extends Room {

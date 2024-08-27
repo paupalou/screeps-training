@@ -79,10 +79,7 @@ function storeResources(creep: Creep) {
         otherTransporters.length &&
         (otherTransporters[0].ticksToLive ?? 0) > (creep.ticksToLive ?? 0)
     ) {
-        if (controllerContainer && creep.transfer(controllerContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(controllerContainer, { visualizePathStyle: { stroke: '#ffaa00' } });
-        }
-
+        Creeps.transfer(creep).to(controllerContainer);
         return;
     }
 

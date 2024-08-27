@@ -13,7 +13,6 @@ export enum CreepRole {
     MINER = 'miner',
     // Expansion temporal types
     EXPANSION_BUILDER = 'expansion_builder',
-    EXPANSION_HARVESTER = 'expansion_harvester',
     EXPANSION_ENERGY_BALANCER = 'expansion_energy_balancer',
     EXPANSION_REPAIRER = 'expansion_repairer',
     EXPANSION_UPGRADER = 'expansion_upgrader'

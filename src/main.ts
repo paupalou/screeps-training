@@ -1,7 +1,6 @@
 import Creeps, { CreepRole } from './creep';
 import Towers from './structure.tower';
 import Builder from './role.builder';
-import Harvester from './role.harvester';
 import Upgrader from './role.upgrader';
 import Repairer from './role.repairer';
 import Transporter, { TRANSPORTERS } from './role.transporter';
@@ -24,12 +23,6 @@ function respawnCreeps() {
         // do not create any other creep if we dont have expected transporter alive
         return;
     }
-
-    // Harvester.spawn();
-    // if (Creeps.count(CreepRole.HARVESTER) < HARVESTERS) {
-    //     // do not create any other creep if we dont have expected harvesters alive
-    //     return;
-    // }
 
     Upgrader.spawn();
     Builder.spawn();
@@ -67,10 +60,6 @@ export function loop(): void {
 
         for (const name in Game.creeps) {
             const creep = Game.creeps[name];
-            if (creep.memory.role === CreepRole.HARVESTER) {
-                Harvester.run(creep);
-                continue;
-            }
 
             if (creep.memory.role === CreepRole.BUILDER) {
                 Builder.run(creep);

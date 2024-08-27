@@ -21,6 +21,11 @@ export class MineralManager {
     }
 
     static needSpawnMiner(room: Room) {
+        const noMineralsInRoom = room.minerals.every(mine => mine.mineralAmount == 0);
+        if (noMineralsInRoom) {
+            return false;
+        }
+
         return MineralManager.miners(room).filter(miner => miner.ticksToLive ?? 0 < 50).length < room.minerals.length;
     }
 

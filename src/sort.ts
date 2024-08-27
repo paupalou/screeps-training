@@ -25,10 +25,10 @@ export function byMoreDamaged(strucA: Structure, strucB: Structure) {
     const healthPercentageStrucA = Number(((strucA.hits / strucA.hitsMax) * 100).toFixed(2));
     const healthPercentageStrucB = Number(((strucB.hits / strucB.hitsMax) * 100).toFixed(2));
 
-    log(`============================================================`);
-    log(`struc ${strucA.structureType} has ${healthPercentageStrucA}%`);
-    log(`struc ${strucB.structureType} has ${healthPercentageStrucB}%`);
-    log(`============================================================`);
+    // log(`============================================================`);
+    // log(`struc ${strucA.structureType} has ${healthPercentageStrucA}%`);
+    // log(`struc ${strucB.structureType} has ${healthPercentageStrucB}%`);
+    // log(`============================================================`);
 
     if (strucB.structureType == STRUCTURE_RAMPART && strucB.hits > 20000) {
       return -1;
