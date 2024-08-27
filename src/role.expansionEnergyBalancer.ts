@@ -100,7 +100,8 @@ function transferToContainerOrStorage(creep: Creep) {
 }
 
 function transfer(creep: Creep) {
-    if (creep.memory.containerId == '66c714833533cc2695f93d71') {
+    if (creep.memory.containerId == '66c714833533cc2695f93d71' ||
+       creep.memory.containerId == '66c7618b818067966b922da7') {
         transferToBase(creep);
     } else if (creep.memory.containerId == '66c7059b6b9246c58cb58be7') {
         transferToContainerOrStorage(creep);
