@@ -86,15 +86,13 @@ function transfer(creep: Creep) {
 
     const cargo = Object.keys(creep.store) as ResourceConstant[];
     const container = Game.getObjectById(creep.memory.targetId as Id<StructureContainer>);
-    if (container && container.store.getFreeCapacity() < creep.store.getUsedCapacity()) {
-        _.forEach(cargo, resource => {
+    _.forEach(cargo, resource => {
+        if (container && container.store.getFreeCapacity() > creep.store.getUsedCapacity()) {
+            Creeps.transfer(creep, resource).to(container);
+        } else {
             Creeps.transfer(creep, resource).to(creep.room.storage);
-        });
-    } else if (!container || container.store.getFreeCapacity() < creep.store.getUsedCapacity()) {
-        _.forEach(cargo, resource => {
-            Creeps.transfer(creep, resource).to(creep.room.storage);
-        });
-    }
+        }
+    });
 }
 
 const ExpansionEnergyBalancer: BaseCreep = {
