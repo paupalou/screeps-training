@@ -24,12 +24,12 @@ export interface BaseCreep {
     run: (creep: Creep) => void;
 }
 
-function getByRole(role: CreepRole) {
-    return _.filter(Game.creeps, creep => creep.memory.role === role);
+function getByRole(role: CreepRole, room?: string) {
+    return _.filter(Game.creeps, creep => creep.memory.role == role && (!room || creep.room.name == room));
 }
 
-function count(role: CreepRole) {
-    return getByRole(role).length;
+function count(role: CreepRole, room?: string) {
+    return getByRole(role, room).length;
 }
 
 function transfer(creep: Creep, resource: ResourceConstant = RESOURCE_ENERGY) {
@@ -135,6 +135,8 @@ function createCreep(
         const nextCreep = { ...creep, name: nextCreepName };
         createCreep(nextCreep);
     }
+
+    return result;
 }
 
 export default {

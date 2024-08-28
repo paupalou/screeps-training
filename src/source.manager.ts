@@ -1,4 +1,6 @@
 import Creeps, { CreepRole } from './creep';
+import { byLessTicksToLive } from './sort';
+import { SpawnQueue } from './spawnQueue';
 import { log } from './utils';
 
 interface HarvesterMemory extends CreepMemory {
@@ -76,37 +78,48 @@ const Harvester = {
 };
 
 export class SourceManager {
-    static work(room: Room) {
-        if (SourceManager.needSpawnHarvester(room)) {
-            SourceManager.spawnHarvester(room);
+    room: Room;
+    spawnQueue: SpawnQueue;
+
+    constructor(room: Room, spawnQueue: SpawnQueue) {
+        this.room = room;
+        this.spawnQueue = spawnQueue;
+
+        this.work();
+    }
+
+    work() {
+        if (this.needSpawnHarvester) {
+            this.spawnQueue.add(() => this.spawnHarvester());
+            // this.spawnHarvester();
         }
 
-        _.forEach(SourceManager.harvesters(room), harvester => {
+        _.forEach(this.harvesters, harvester => {
             Harvester.work(harvester);
         });
     }
 
-    static harvesters(room: Room) {
+    get harvesters() {
         return _.filter(
             Game.creeps,
-            creep => creep.memory.role == CreepRole.HARVESTER && creep.room.name == room.name
+            creep => creep.memory.role == CreepRole.HARVESTER && creep.room.name == this.room.name
         ) as HarvesterCreep[];
     }
 
-    static needSpawnHarvester(room: Room) {
+    get needSpawnHarvester() {
         return (
-            SourceManager.harvesters(room).filter(harvester => {
+            this.harvesters.filter(harvester => {
                 if (harvester.spawning || harvester.ticksToLive == undefined) {
                     return true;
                 }
                 return harvester.ticksToLive >= 75;
-            }).length < room.sources.length
+            }).length < this.room.sources.length
         );
     }
 
-    static spawnHarvester(room: Room) {
+    spawnHarvester() {
         const spawn = _.first(
-            room.find(FIND_MY_STRUCTURES, {
+            this.room.find(FIND_MY_STRUCTURES, {
                 filter: structure => structure.structureType == STRUCTURE_SPAWN
             })
         );
@@ -114,27 +127,28 @@ export class SourceManager {
             return;
         }
 
-        const dyingHarvester = this.harvesters(room).find(harvester => {
-            if (harvester.spawning || harvester.ticksToLive == undefined) {
-                return false;
-            }
-            return harvester.ticksToLive < 75;
-        });
+        const dyingHarvester = this.harvesters
+            .filter(harvester => {
+                if (harvester.spawning || harvester.ticksToLive == undefined) {
+                    return false;
+                }
+                return harvester.ticksToLive < 75;
+            })
+            .sort(byLessTicksToLive);
 
         const actions = [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE];
         const harvester = {
             actions,
-            name: `ExpansionHarvester${SourceManager.harvesters(room).length + 1}`,
+            name: `ExpansionHarvester${this.harvesters.length + 1}`,
             spawn: spawn.name,
             opts: {
                 memory: {
                     role: CreepRole.HARVESTER,
-                    ...dyingHarvester?.memory
+                    ..._.first(dyingHarvester)?.memory
                 }
             }
         };
-        if (!spawn.spawning) {
-            Creeps.create(harvester);
-        }
+
+        return Creeps.create(harvester);
     }
 }

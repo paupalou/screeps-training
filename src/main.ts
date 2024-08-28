@@ -32,8 +32,16 @@ function respawnCreeps() {
     Invader.spawn();
 
     // Expansion
-    ExpansionUpgrader.spawn();
     ExpansionEnergyBalancer.spawn();
+    // TODO Implement some kind of spawnQueue
+    if (Creeps.count(CreepRole.HARVESTER, 'E18S27') < 2) {
+        return;
+    }
+    if (Creeps.count(CreepRole.EXPANSION_ENERGY_BALANCER, 'E18S27') < 2) {
+        return;
+    }
+
+    ExpansionUpgrader.spawn();
     ExpansionBuilder.spawn();
     ExpansionRepairer.spawn();
 }

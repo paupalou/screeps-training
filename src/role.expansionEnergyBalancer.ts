@@ -136,7 +136,8 @@ const ExpansionEnergyBalancer: BaseCreep = {
         }
 
         const expansionEnergyBalancer = {
-            actions: [...Array(distanceOfContainers).fill(CARRY), ...Array(distanceOfContainers / 2).fill(MOVE)],
+            // actions: [...Array(distanceOfContainers).fill(CARRY), ...Array(distanceOfContainers / 2).fill(MOVE)],
+            actions: [CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE],
             name: `ExpansionEnergyBalancer${expansionEnergyBalancerCount + 1}`,
             spawn: 'Spawn2',
             opts: {

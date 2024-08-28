@@ -59,7 +59,7 @@ export function byFarestTo(posA: RoomPosition, posB: RoomPosition) {
     };
 }
 
-export function byMoreTicksToLive(creepA: Creep, creepB: Creep) {
+export function byLessTicksToLive(creepA: Creep, creepB: Creep) {
     const creepAticks = creepA.ticksToLive ?? 0;
     const creepBticks = creepB.ticksToLive ?? 0;
 
