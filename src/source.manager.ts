@@ -1,8 +1,7 @@
-import { CreepRole } from './creep';
 import Harvester, { HarvesterCreep } from './creep.harvester';
-import { byLessTicksToLive } from './sort';
+import { CreepRole } from './creep';
 import { SpawnQueue } from './spawnQueue';
-import { log } from './utils';
+import { byLessTicksToLive } from './sort';
 
 export class SourceManager {
     room: Room;
@@ -18,7 +17,6 @@ export class SourceManager {
     work() {
         if (this.needSpawnHarvester) {
             this.spawnQueue.add(() => this.spawnHarvester());
-            // this.spawnHarvester();
         }
 
         _.forEach(this.harvesters, harvester => {
@@ -64,25 +62,7 @@ export class SourceManager {
             .sort(byLessTicksToLive);
 
         const actions = [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE];
-
-        let creepCounter = 0;
-        let nameWithCounter: string;
-        let dryRun: ScreepsReturnCode;
-
-        do {
-            nameWithCounter = `Harvester${creepCounter++}`;
-            log(`trying with ${nameWithCounter}`)
-            dryRun = spawn.spawnCreep(actions, nameWithCounter, {
-                memory: {
-                    role: CreepRole.HARVESTER,
-                    ..._.first(dyingHarvester)?.memory
-                },
-                dryRun: true
-            });
-        } while (dryRun == ERR_NAME_EXISTS);
-
-        return spawn.spawnCreep(actions, nameWithCounter, {
-        // return spawn.spawnCreep(actions, 'Harvester', {
+        return spawn.spawnCreep(actions, 'Harvester', {
             memory: {
                 role: CreepRole.HARVESTER,
                 ..._.first(dyingHarvester)?.memory

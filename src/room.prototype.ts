@@ -73,3 +73,17 @@ Object.defineProperty(Room.prototype, 'towers', {
     enumerable: false,
     configurable: true
 });
+
+Object.defineProperty(Room.prototype, 'energySpawnCapacity', {
+    get() {
+        const spawnCapacity = this.spawn.store.getCapacity(RESOURCE_ENERGY) ?? 0;
+        const extensionsCapacity = this.extensions.reduce(
+            (acc: number, curr: StructureExtension) => acc + curr.store.getCapacity(RESOURCE_ENERGY),
+            0
+        );
+
+        return spawnCapacity + extensionsCapacity;
+    },
+    enumerable: false,
+    configurable: true
+});

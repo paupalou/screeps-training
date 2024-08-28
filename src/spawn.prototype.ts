@@ -10,13 +10,12 @@ if (!StructureSpawn.prototype._spawnCreep) {
         let nameWithCounter: string;
         let dryRun: ScreepsReturnCode;
         do {
-            nameWithCounter = `${name}${creepCounter++}`;
+            nameWithCounter = `${name}${++creepCounter}`;
             dryRun = this._spawnCreep(body, nameWithCounter, { ...opts, dryRun: true });
-        } while (dryRun !== ERR_NAME_EXISTS);
+        } while (dryRun == ERR_NAME_EXISTS);
 
         // Now we call the original function passing in our generated name and
         // returning the value
-        return this._spawnCreep(body, name, opts);
-        // return -6;
+        return this._spawnCreep(body, nameWithCounter, opts);
     };
 }

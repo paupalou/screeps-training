@@ -51,9 +51,11 @@ declare global {
         minerals: Mineral[];
         towers: StructureTower[];
         storage: StructureStorage;
+        energySpawnCapacity: number;
     }
 
     // Prototypes
+    // Structures
     interface StructureSpawn extends StructureSpawn {
       _spawnCreep: (bodyParts: BodyPartConstant[], name: string, opts: SpawnOptions) => ScreepsReturnCode;
       spawnCreep: (bodyParts: BodyPartConstant[], name: string, opts: SpawnOptions) => ScreepsReturnCode;
