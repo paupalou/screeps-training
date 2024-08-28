@@ -8,7 +8,7 @@ function nothingToBuild() {
     return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES).length == 0;
 }
 
-const DISMANTLE_TARGET = '66c46950cb7941730df11d52';
+const DISMANTLE_TARGET = '66c1d01670d96516266dcbb4';
 const ENERGY_FROM = '66cb141f9d107301af33c924';
 
 function dismantle(creep: Creep) {
