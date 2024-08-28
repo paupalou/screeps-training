@@ -52,4 +52,10 @@ declare global {
         towers: StructureTower[];
         storage: StructureStorage;
     }
+
+    // Prototypes
+    interface StructureSpawn extends StructureSpawn {
+      _spawnCreep: (bodyParts: BodyPartConstant[], name: string, opts: SpawnOptions) => ScreepsReturnCode;
+      spawnCreep: (bodyParts: BodyPartConstant[], name: string, opts: SpawnOptions) => ScreepsReturnCode;
+    }
 }
