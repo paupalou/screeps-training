@@ -13,10 +13,6 @@ export class RoomManager {
         _.filter(Game.rooms, room => itsMyRoom(room)).forEach(room => {
             log(`======  INIT ROOM ${room.name} ========`);
             const spawnQueue = new SpawnQueue();
-            spawnQueue.add(() => 0);
-            spawnQueue.add(() => ERR_NOT_ENOUGH_ENERGY);
-            spawnQueue.add(() => ERR_BUSY);
-            spawnQueue.run();
 
             RoomAnalyst.work(room);
             new SourceManager(room, spawnQueue);
