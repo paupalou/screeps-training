@@ -14,7 +14,7 @@ const Upgrader: BaseCreep = {
 
         const nextUpgraderNumber = upgraderCount + 1;
         const upgrader = {
-            actions: [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE],
+            actions: [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE],
             name: `Upgrader${nextUpgraderNumber}`,
             spawn: 'Spawn1',
             opts: {

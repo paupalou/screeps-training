@@ -50,8 +50,6 @@ declare global {
         sources: Source[];
         minerals: Mineral[];
         towers: StructureTower[];
-        storage: StructureStorage;
-        energySpawnCapacity: number;
     }
 
     // Prototypes

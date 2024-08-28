@@ -8,7 +8,7 @@ function nothingToBuild() {
     return Game.rooms['E18S28'].find(FIND_CONSTRUCTION_SITES).length == 0;
 }
 
-const DISMANTLE_TARGET = '66c1d01670d96516266dcbb4';
+const DISMANTLE_TARGET = '66c1da3e330f8c0bb3f6a577';
 const ENERGY_FROM = '66cb141f9d107301af33c924';
 
 function dismantle(creep: Creep) {
@@ -24,12 +24,13 @@ function dismantle(creep: Creep) {
             creep.moveTo(storage, { visualizePathStyle: { stroke: '#ffaa00' } });
         }
     } else {
-        const closestContainer = creep.closestContainer;
-        if (!closestContainer || closestContainer.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
-            return;
-        }
-        if (creep.withdraw(closestContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(closestContainer, { visualizePathStyle: { stroke: '#ffaa00' } });
+        // const closestContainer = creep.closestContainer;
+        // if (!closestContainer || closestContainer.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
+        //     return;
+        // }
+        const container = Game.getObjectById(ENERGY_FROM as Id<StructureContainer>);
+        if (container && creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
         }
     }
     // } else {

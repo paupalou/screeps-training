@@ -30,7 +30,8 @@ export default {
             if (nonUsedSourceId) {
                 log(`Setting sourceId & workSpot for Harvester ${creep.name}`);
                 creep.memory.sourceId = nonUsedSourceId;
-                creep.memory.workSpot = creep.room.memory.harvestSpots[nonUsedSourceId];
+                // TODO Dynamic spot assign
+                creep.memory.workSpot = creep.room.memory.harvestSpots[nonUsedSourceId][0];
             }
         }
 

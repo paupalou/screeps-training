@@ -24,16 +24,6 @@ Object.defineProperty(Room.prototype, 'unfinishedSpawn', {
     configurable: true
 });
 
-Object.defineProperty(Room.prototype, 'storage', {
-    get() {
-        return this.find(FIND_STRUCTURES, {
-            filter: (structure: Structure) => structure.structureType == STRUCTURE_STORAGE
-        })[0];
-    },
-    enumerable: false,
-    configurable: true
-});
-
 Object.defineProperty(Room.prototype, 'sources', {
     get() {
         const storedSources: string[] | undefined = this.memory.sources;
@@ -69,20 +59,6 @@ Object.defineProperty(Room.prototype, 'towers', {
         return this.find(FIND_STRUCTURES, {
             filter: (structure: Structure) => structure.structureType === STRUCTURE_TOWER
         });
-    },
-    enumerable: false,
-    configurable: true
-});
-
-Object.defineProperty(Room.prototype, 'energySpawnCapacity', {
-    get() {
-        const spawnCapacity = this.spawn.store.getCapacity(RESOURCE_ENERGY) ?? 0;
-        const extensionsCapacity = this.extensions.reduce(
-            (acc: number, curr: StructureExtension) => acc + curr.store.getCapacity(RESOURCE_ENERGY),
-            0
-        );
-
-        return spawnCapacity + extensionsCapacity;
     },
     enumerable: false,
     configurable: true

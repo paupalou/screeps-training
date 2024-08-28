@@ -49,7 +49,7 @@ export class RoomAnalyst {
             .sort((posA, posB) => byFarestTo(posA, posB).spawn(room.spawn))
             .slice(0, 3);
 
-        room.memory.upgraderSpots = upgraderPositions.map(pos => [pos.x,pos.y]);
+        room.memory.upgraderSpots = upgraderPositions.map(pos => [pos.x, pos.y]);
     }
 
     static findBestHarvestEnergySpots(room: Room) {
@@ -73,32 +73,50 @@ export class RoomAnalyst {
             }
 
             const roomMap = new RoomMap(room.name);
-            const miningBestSpot = getAdjacentPositions(source.pos, room.name)
-                .filter(adjacentSpot => roomMap.isNotWallPosition(adjacentSpot))
-                .reduce((acc, position) => {
-                    if (!acc) {
-                        return position;
+            const miningBestSpots = getAdjacentPositions(source.pos, room.name)
+                .filter(
+                    adjacentSpot =>
+                        roomMap.isNotWallPosition(adjacentSpot) &&
+                        adjacentSpot.lookFor(LOOK_STRUCTURES).filter(s => s.structureType == STRUCTURE_WALL).length == 0
+                )
+                // .reduce((acc, position) => {
+                //     if (!acc) {
+                //         return position;
+                //     }
+                //
+                //     if (PathFinder.search(acc, roomSpawn.pos).cost > PathFinder.search(position, roomSpawn.pos).cost) {
+                //         return position;
+                //     }
+                //
+                //     return acc;
+                // });
+                .map(position => {
+                    const costToSpawn = PathFinder.search(position, roomSpawn.pos).cost;
+                    return [costToSpawn, [position.x, position.y]];
+                })
+                .sort(([positionCostA], [positionCostB]) => {
+                    if (positionCostA > positionCostB) {
+                        return 1;
+                    } else if (positionCostB > positionCostA) {
+                        return -1;
                     }
 
-                    if (PathFinder.search(acc, roomSpawn.pos).cost > PathFinder.search(position, roomSpawn.pos).cost) {
-                        return position;
-                    }
-
-                    return acc;
+                    return 0;
                 });
 
-            if (!miningBestSpot) {
+            if (miningBestSpots.length == 0) {
                 return;
             }
 
             storedSpots = room.memory.harvestSpots;
+            const positions = miningBestSpots.map(([, position]) => position);
             if (storedSpots && Object.keys(storedSpots).length) {
                 room.memory.harvestSpots = {
                     ...storedSpots,
-                    [source.id]: [miningBestSpot.x, miningBestSpot.y]
+                    [source.id]: positions
                 };
             } else {
-                room.memory.harvestSpots = { [source.id]: [miningBestSpot.x, miningBestSpot.y] };
+                room.memory.harvestSpots = positions;
             }
         });
     }
@@ -167,7 +185,7 @@ export class RoomAnalyst {
         const roomSpawn = room.spawn ?? room.unfinishedSpawn;
         _.forEach(Object.keys(harvestSpots), sourceId => {
             const roomMap = new RoomMap(room.name);
-            const [x, y] = harvestSpots[sourceId];
+            const [x, y] = harvestSpots[sourceId][0];
             const spotPosition = new RoomPosition(x, y, room.name);
             const containerBestSpot = getAdjacentPositions(spotPosition, room.name)
                 .filter(adjacentSpot => roomMap.isNotWallPosition(adjacentSpot))

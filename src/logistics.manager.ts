@@ -13,8 +13,8 @@ export class LogisticsManager {
     }
 
     work() {
-        log(
-            `[LogisticsManager] energy capacity for room  ${this.room.name} = ${this.room.energyCapacityAvailable}`
-        );
+        // log(
+        //     `[LogisticsManager] energy capacity for room  ${this.room.name} = ${this.room.energyCapacityAvailable}`
+        // );
     }
 }
