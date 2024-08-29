@@ -16,15 +16,15 @@ export class SourceManager {
 
         this.work();
 
-        const data = this.harvesters.reduce(
-            (acc, curr) => {
-                return {
-                    ...acc,
-                    [curr.memory.sourceId]: (acc[curr.memory.sourceId] ?? 0) + 1
-                };
-            },
-            {} as Record<string, number>
-        );
+        // const data = this.harvesters.reduce(
+        //     (acc, curr) => {
+        //         return {
+        //             ...acc,
+        //             [curr.memory.sourceId]: (acc[curr.memory.sourceId] ?? 0) + 1
+        //         };
+        //     },
+        //     {} as Record<string, number>
+        // );
         // log(this.dyingHarvesters);
         // log(this.harvesters.sort(byLessTicksToLive).map(c => c.ticksToLive));
         // table(data, `Room ${room.name}`);

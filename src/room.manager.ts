@@ -3,7 +3,7 @@ import { MineralManager } from './mineral.manager';
 import { RoomAnalyst } from './room.analyst';
 import { SourceManager } from './source.manager';
 import { SpawnQueue } from './spawnQueue';
-import { log } from './utils';
+import { log, table } from './utils';
 
 function itsMyRoom(room: Room) {
     return room.controller?.my || false;
@@ -16,6 +16,8 @@ export class RoomManager {
             const spawnQueue = new SpawnQueue();
 
             RoomAnalyst.work(room);
+
+            table(room.memory.harvestSpots, `Harvest spots for ${room.name}`);
             new SourceManager(room, spawnQueue);
 
             new LogisticsManager(room, spawnQueue);
