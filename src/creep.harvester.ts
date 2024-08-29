@@ -1,5 +1,5 @@
-import Creeps, { CreepRole } from "./creep";
-import { log } from "./utils";
+import Creeps, { CreepRole } from './creep';
+import { log } from './utils';
 
 interface HarvesterMemory extends CreepMemory {
     workSpot: [number, number];
@@ -38,11 +38,10 @@ export default {
         // Check containerId and save to memory if not found
         if (!creep.memory.containerId) {
             const containerCoords = creep.room.memory.containerSpots[creep.memory.sourceId];
-            const containerPos: RoomPosition = new RoomPosition(
-                containerCoords[0],
-                containerCoords[1],
-                creep.room.name
-            );
+            const containerPos = creep.room.getPositionAt(containerCoords[0], containerCoords[1]);
+            if (!containerPos) {
+              return;
+            }
 
             const positionStructures = containerPos.lookFor(LOOK_STRUCTURES);
             const container = _.find(positionStructures, structure => structure.structureType == STRUCTURE_CONTAINER);

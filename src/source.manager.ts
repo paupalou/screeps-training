@@ -25,8 +25,10 @@ export class SourceManager {
             },
             {} as Record<string, number>
         );
-        // log(`Source data for room ${room.name}`);
-        // log(data);
+        // log(this.dyingHarvesters);
+        log(this.harvesters.sort(byLessTicksToLive).map(c => c.ticksToLive));
+        log(`Source data for room ${room.name}`);
+        log(data);
     }
 
     work() {
@@ -41,14 +43,6 @@ export class SourceManager {
         // log(
         //     `Sources in room ${this.room.name} needs ${this.harvestersPerSource} harvesters with body [${_.map(this.nextHarvesterBodyParts, (part: string) => part.toUpperCase())}]`
         // );
-        if (this.room.name == 'E18S28') {
-            const ticksNeededToSpawn = this.nextHarvesterBodyParts.length * 3;
-            const source = Game.getObjectById('5bbcae009099fc012e638470' as Id<Source>);
-            if (source) {
-                const costToSource = PathFinder.search(this.room.spawn.pos, { pos: source.pos, range: 1 });
-                log(`total ticks needed ${ticksNeededToSpawn + costToSource.cost}`);
-            }
-        }
     }
 
     get needSpawnHarvester() {
@@ -65,6 +59,7 @@ export class SourceManager {
 
     spawnHarvester() {
         const consumedCreepIds = this.harvesters.map(c => c.memory.replaceCreep);
+        log(`consumedCreepIds: ${consumedCreepIds}`);
         const creepsCloseToDie = this.dyingHarvesters.filter(
             dyingHarvester => !consumedCreepIds.includes(dyingHarvester.id)
         );
