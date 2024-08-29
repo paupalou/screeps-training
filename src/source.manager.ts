@@ -2,7 +2,7 @@ import Harvester, { HarvesterCreep } from './creep.harvester';
 import { CreepRole } from './creep';
 import { SpawnQueue } from './spawnQueue';
 import { byLessTicksToLive } from './sort';
-import { log } from './utils';
+import { log, table } from './utils';
 
 const DYING_BREAKPOINT = 75;
 
@@ -26,9 +26,8 @@ export class SourceManager {
             {} as Record<string, number>
         );
         // log(this.dyingHarvesters);
-        log(this.harvesters.sort(byLessTicksToLive).map(c => c.ticksToLive));
-        log(`Source data for room ${room.name}`);
-        log(data);
+        // log(this.harvesters.sort(byLessTicksToLive).map(c => c.ticksToLive));
+        // table(data, `Room ${room.name}`);
     }
 
     work() {
