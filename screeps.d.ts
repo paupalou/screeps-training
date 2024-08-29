@@ -50,6 +50,8 @@ declare global {
         sources: Source[];
         minerals: Mineral[];
         towers: StructureTower[];
+        containers: StructureContainer[];
+        links: StructureLinks[];
     }
 
     // Prototypes

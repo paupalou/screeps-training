@@ -17,7 +17,7 @@ export class RoomManager {
 
             RoomAnalyst.work(room);
 
-            table(room.memory.harvestSpots, `Harvest spots for ${room.name}`);
+            // table(room.memory.harvestSpots, `Harvest spots for ${room.name}`);
             new SourceManager(room, spawnQueue);
 
             new LogisticsManager(room, spawnQueue);

@@ -63,3 +63,23 @@ Object.defineProperty(Room.prototype, 'towers', {
     enumerable: false,
     configurable: true
 });
+
+Object.defineProperty(Room.prototype, 'containers', {
+    get() {
+        return this.find(FIND_STRUCTURES, {
+            filter: (structure: Structure) => structure.structureType === STRUCTURE_CONTAINER
+        });
+    },
+    enumerable: false,
+    configurable: true
+});
+
+Object.defineProperty(Room.prototype, 'links', {
+    get() {
+        return this.find(FIND_STRUCTURES, {
+            filter: (structure: Structure) => structure.structureType === STRUCTURE_LINK
+        });
+    },
+    enumerable: false,
+    configurable: true
+});
