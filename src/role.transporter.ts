@@ -83,18 +83,6 @@ function storeResources(creep: Creep) {
         return;
     }
 
-    // check if creep has some resource that is not energy
-    _.filter(Object.keys(creep.store) as ResourceConstant[], resource => resource != RESOURCE_ENERGY).forEach(
-        nonEnergyResource => {
-            if (creep.room.storage) {
-                Creeps.transfer(creep, nonEnergyResource).to(creep.room.storage);
-            } else {
-                Creeps.transfer(creep).to(creep.closestContainer);
-            }
-            return;
-        }
-    );
-
     const spawn = Creeps.get(creep).spawn();
     const extensions = Creeps.get(creep).spawnExtensions();
 
@@ -159,6 +147,18 @@ const Transporter: BaseCreep = {
         Creeps.create(harvester);
     },
     run: function (creep) {
+        // check if creep has some resource that is not energy
+        _.filter(Object.keys(creep.store) as ResourceConstant[], resource => resource != RESOURCE_ENERGY).forEach(
+            nonEnergyResource => {
+                if (creep.room.storage) {
+                    Creeps.transfer(creep, nonEnergyResource).to(creep.room.storage);
+                } else {
+                    Creeps.transfer(creep).to(creep.closestContainer);
+                }
+                return;
+            }
+        );
+
         if (!creep.memory.transporting && creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
             creep.memory.transporting = true;
         }
@@ -180,7 +180,8 @@ const Transporter: BaseCreep = {
                 controllerContainer &&
                 controllerContainer?.store.energy < 1500 &&
                 otherTransporters.length &&
-                (otherTransporters[0].ticksToLive ?? 0) > (creep.ticksToLive ?? 0)
+                (otherTransporters[0].ticksToLive ?? 0) > (creep.ticksToLive ?? 0) &&
+                creep.room.storage && creep.room.storage?.store.energy > 0
             ) {
                 withdrawResources(creep, creep.room.storage);
             } else {
