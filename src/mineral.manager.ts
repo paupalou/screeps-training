@@ -22,7 +22,12 @@ export class MineralManager {
 
     static needSpawnMiner(room: Room) {
         const noMineralsInRoom = room.minerals.every(mine => mine.mineralAmount == 0);
-        if (noMineralsInRoom) {
+        const noExtractorsInRoom =
+            room.find(FIND_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_EXTRACTOR
+            }).length == 0;
+
+        if (noMineralsInRoom || noExtractorsInRoom) {
             return false;
         }
 

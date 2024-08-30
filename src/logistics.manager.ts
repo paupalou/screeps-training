@@ -41,6 +41,37 @@ export class LogisticsManager {
     }
 
     work() {
+        const containerCloseToController = this.room.controller?.pos.findInRange(FIND_STRUCTURES, 3, {
+            filter: s => s.structureType == STRUCTURE_CONTAINER
+        });
+
+        // table((containerCloseToController ?? []).reduce((acc,curr) => {
+        //   return {
+        //     ...acc,
+        //     [`${curr.pos.x},${curr.pos.y}`]: true,
+        //   }
+        // }, {} as Record<string, unknown>), ['Container Position'], `Containers close to controller in room ${this.room.name}`);
+
+        const containersDistanceToSpawn = this.room.containers
+            .filter(container => {
+                if (containerCloseToController?.length) {
+                    return container.id != containerCloseToController[0].id;
+                }
+
+                return true;
+            })
+            .reduce(
+                (acc, container) => {
+                    return {
+                        ...acc,
+                        [`${container.pos.x},${container.pos.y}`]: PathFinder.search(this.room.spawn.pos, container.pos)
+                            .cost
+                    };
+                },
+                {} as Record<string, unknown>
+            );
+
+        // table(containersDistanceToSpawn, ['Container Position', 'Distance to spawn'], `Distance for container-spawn in room ${this.room.name}`);
         // this.#debugContainers();
         // this.#debugLinks();
     }

@@ -117,7 +117,7 @@ const ExpansionEnergyBalancer: BaseCreep = {
             return;
         }
 
-        const containerId = getUnusedSourceContainer(room);
+        const containerId = getUnusedSourceContainer(room) ?? '66c714833533cc2695f93d71';
         const targetId = getControllerContainer(room);
 
         const from = Game.getObjectById(containerId as Id<StructureContainer>);
@@ -151,6 +151,8 @@ const ExpansionEnergyBalancer: BaseCreep = {
         Creeps.create(expansionEnergyBalancer);
     },
     run: function (creep) {
+
+
         if (creep.memory.transfering && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.transfering = false;
         }
@@ -159,6 +161,26 @@ const ExpansionEnergyBalancer: BaseCreep = {
         }
 
         if (creep.store.energy === 0 || (!creep.memory.transfering && creep.store.getFreeCapacity() > 0)) {
+            // TODO Implement move all materials if found in some containers into storage
+
+            // Commented code to move materials to storage
+            // const container = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
+            //
+            // if (container) {
+            //   const materialsInContainer = Object.keys(container.store);
+            //   if (materialsInContainer.length == 0 || creep.isFull) {
+            //     transferToContainerOrStorage(creep);
+            //     return;
+            //   }
+            //
+            //   _.forEach(materialsInContainer, (resource) => {
+            //       if (creep.withdraw(container, resource as ResourceConstant) == ERR_NOT_IN_RANGE) {
+            //           creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
+            //       }
+            //   })
+            // }
+            //
+
             const droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
             if (droppedEnergy) {
                 if (creep.pickup(droppedEnergy) == ERR_NOT_IN_RANGE) {
