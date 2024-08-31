@@ -42,7 +42,7 @@ const ExpansionBuilder: BaseCreep = {
                 .find<StructureContainer>(FIND_STRUCTURES, {
                     filter: structure =>
                         structure.structureType == STRUCTURE_CONTAINER &&
-                        structure.id != '66c7618b818067966b922da7' && // controller container
+                        // structure.id != '66c7618b818067966b922da7' && // controller container
                         structure.store.energy >= creep.store.getFreeCapacity(RESOURCE_ENERGY)
                 })
                 .sort((sA, sB) => {

@@ -74,7 +74,6 @@ export class SourceManager {
                 replaceCreep: someCreepCloseToDie.id
             };
         }
-
         return this.room.spawn.spawnCreep(this.nextHarvesterBodyParts, 'Harvester', {
             memory
         });

@@ -137,6 +137,7 @@ const ExpansionEnergyBalancer: BaseCreep = {
 
         const expansionEnergyBalancer = {
             // actions: [...Array(distanceOfContainers).fill(CARRY), ...Array(distanceOfContainers / 2).fill(MOVE)],
+            // actions: [CARRY, CARRY, MOVE, MOVE],
             actions: [CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE],
             name: `ExpansionEnergyBalancer${expansionEnergyBalancerCount + 1}`,
             spawn: 'Spawn2',
@@ -164,22 +165,22 @@ const ExpansionEnergyBalancer: BaseCreep = {
             // TODO Implement move all materials if found in some containers into storage
 
             // Commented code to move materials to storage
-            // const container = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
-            //
-            // if (container) {
-            //   const materialsInContainer = Object.keys(container.store);
-            //   if (materialsInContainer.length == 0 || creep.isFull) {
-            //     transferToContainerOrStorage(creep);
-            //     return;
-            //   }
-            //
-            //   _.forEach(materialsInContainer, (resource) => {
-            //       if (creep.withdraw(container, resource as ResourceConstant) == ERR_NOT_IN_RANGE) {
-            //           creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
-            //       }
-            //   })
-            // }
-            //
+            const container = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
+
+            if (container) {
+              const materialsInContainer = Object.keys(container.store);
+              if (materialsInContainer.length == 0 || creep.isFull) {
+                transferToContainerOrStorage(creep);
+                return;
+              }
+
+              _.forEach(materialsInContainer, (resource) => {
+                  if (creep.withdraw(container, resource as ResourceConstant) == ERR_NOT_IN_RANGE) {
+                      creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
+                  }
+              })
+            }
+
 
             const droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
             if (droppedEnergy) {

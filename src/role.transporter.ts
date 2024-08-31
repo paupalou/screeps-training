@@ -186,7 +186,10 @@ const Transporter: BaseCreep = {
                 withdrawResources(creep, creep.room.storage);
             } else {
                 const topContainer = Game.getObjectById('66cb141f9d107301af33c924' as Id<StructureContainer>);
+                // const bottomContainer = Game.getObjectById('66cb30d9dcae057625b8bc48' as Id<StructureContainer>);
+
                 topContainer && withdrawResources(creep, topContainer);
+                // bottomContainer && withdrawResources(creep, bottomContainer);
             }
         }
     }

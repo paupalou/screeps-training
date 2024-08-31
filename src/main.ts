@@ -15,6 +15,9 @@ import ExpansionUpgrader from './role.expansionUpgrader';
 import Profiler from './profiler';
 import './prototypes';
 
+// import { hello } from './creeps/hola';
+// hello()
+
 const PROFILE = true;
 
 function respawnCreeps() {

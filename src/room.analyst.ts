@@ -143,7 +143,11 @@ export class RoomAnalyst {
 
             const roomMap = new RoomMap(room.name);
             const extractBestSpot = getAdjacentPositions(mineral.pos, room.name)
-                .filter(adjacentSpot => roomMap.isNotWallPosition(adjacentSpot))
+                .filter(
+                    adjacentSpot =>
+                        roomMap.isNotWallPosition(adjacentSpot) &&
+                        adjacentSpot.lookFor(LOOK_STRUCTURES).filter(s => s.structureType == STRUCTURE_WALL).length == 0
+                )
                 .reduce((acc, position) => {
                     if (!acc) {
                         return position;
