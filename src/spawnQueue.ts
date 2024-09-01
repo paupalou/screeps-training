@@ -18,6 +18,7 @@ export class SpawnQueue {
 
         if (result != OK) {
             log(`[SpawnQueue] Spawn error ${result}`);
+            log(this.queue);
             return;
         }
 

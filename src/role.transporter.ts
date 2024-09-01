@@ -136,6 +136,7 @@ const Transporter: BaseCreep = {
         }
         const harvester = {
             actions: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+            // actions: [CARRY, MOVE],
             name: `Transporter${transporterCount + 1}`,
             spawn: 'Spawn1',
             opts: {

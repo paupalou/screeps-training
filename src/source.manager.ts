@@ -74,9 +74,14 @@ export class SourceManager {
                 replaceCreep: someCreepCloseToDie.id
             };
         }
+
         return this.room.spawn.spawnCreep(this.nextHarvesterBodyParts, 'Harvester', {
             memory
         });
+
+        // return this.room.spawn.spawnCreep([WORK,WORK, MOVE,CARRY], 'Harvester', {
+        //     memory
+        // });
     }
 
     get harvesters() {
