@@ -100,8 +100,10 @@ function transferToContainerOrStorage(creep: Creep) {
 }
 
 function transfer(creep: Creep) {
-    if (creep.memory.containerId == '66c714833533cc2695f93d71' ||
-       creep.memory.containerId == '66c7618b818067966b922da7') {
+    if (
+        creep.memory.containerId == '66c714833533cc2695f93d71' ||
+        creep.memory.containerId == '66c7618b818067966b922da7'
+    ) {
         transferToBase(creep);
     } else if (creep.memory.containerId == '66c7059b6b9246c58cb58be7') {
         transferToContainerOrStorage(creep);
@@ -152,8 +154,6 @@ const ExpansionEnergyBalancer: BaseCreep = {
         Creeps.create(expansionEnergyBalancer);
     },
     run: function (creep) {
-
-
         if (creep.memory.transfering && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.transfering = false;
         }
@@ -161,26 +161,56 @@ const ExpansionEnergyBalancer: BaseCreep = {
             creep.memory.transfering = true;
         }
 
-        if (creep.store.energy === 0 || (!creep.memory.transfering && creep.store.getFreeCapacity() > 0)) {
-            // TODO Implement move all materials if found in some containers into storage
+        // TODO Implement move all materials if found in some containers into storage
+        // const materialsInCreep = Object.keys(creep.store).filter(mat => mat != RESOURCE_ENERGY);
+        // if (materialsInCreep.length > 0) {
+        //     _.forEach(materialsInCreep, resource => {
+        //         if (
+        //             creep.room.storage != undefined &&
+        //             creep.transfer(creep.room.storage, resource as ResourceConstant) == ERR_NOT_IN_RANGE
+        //         ) {
+        //             creep.moveTo(creep.room.storage, { visualizePathStyle: { stroke: '#ffffff' } });
+        //         }
+        //     });
+        //     return;
+        // }
+        //
+        // const targetContainer = Game.getObjectById(creep.memory.targetId as Id<StructureContainer>);
+        //
+        // if (targetContainer) {
+        //     const materialsInContainer = Object.keys(targetContainer.store).filter(mat => mat != RESOURCE_ENERGY);
+        //     if (materialsInContainer.length == 0 || creep.isFull) {
+        //         transferToContainerOrStorage(creep);
+        //         return;
+        //     }
+        //
+        //     _.forEach(materialsInContainer, resource => {
+        //         if (creep.withdraw(targetContainer, resource as ResourceConstant) == ERR_NOT_IN_RANGE) {
+        //             creep.moveTo(targetContainer, { visualizePathStyle: { stroke: '#ffffff' } });
+        //         }
+        //     });
+        //     return;
+        // }
+        //
+        // REMOVE
 
+        if (creep.store.energy === 0 || (!creep.memory.transfering && creep.store.getFreeCapacity() > 0)) {
             // Commented code to move materials to storage
             const container = Game.getObjectById(creep.memory.containerId as Id<StructureContainer>);
 
             if (container) {
-              const materialsInContainer = Object.keys(container.store);
-              if (materialsInContainer.length == 0 || creep.isFull) {
-                transferToContainerOrStorage(creep);
-                return;
-              }
+                const materialsInContainer = Object.keys(container.store);
+                if (materialsInContainer.length == 0 || creep.isFull) {
+                    transferToContainerOrStorage(creep);
+                    return;
+                }
 
-              _.forEach(materialsInContainer, (resource) => {
-                  if (creep.withdraw(container, resource as ResourceConstant) == ERR_NOT_IN_RANGE) {
-                      creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
-                  }
-              })
+                _.forEach(materialsInContainer, resource => {
+                    if (creep.withdraw(container, resource as ResourceConstant) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
+                    }
+                });
             }
-
 
             const droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
             if (droppedEnergy) {
