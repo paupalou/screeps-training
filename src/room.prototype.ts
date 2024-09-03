@@ -1,3 +1,6 @@
+import { CreepRole } from './creep';
+import { log } from './utils';
+
 Object.defineProperty(Room.prototype, 'spawn', {
     get() {
         const storedSpawn: string | undefined = this.memory.spawnId;
@@ -79,6 +82,32 @@ Object.defineProperty(Room.prototype, 'links', {
         return this.find(FIND_STRUCTURES, {
             filter: (structure: Structure) => structure.structureType === STRUCTURE_LINK
         });
+    },
+    enumerable: false,
+    configurable: true
+});
+
+Object.defineProperty(Room.prototype, 'controllerEnergyFrom', {
+    get() {
+        if (this.memory.linkController) {
+            return Game.getObjectById(this.memory.linkController as Id<StructureLink>);
+        } else if (this.memory.containerController) {
+            return Game.getObjectById(this.memory.containerController as Id<StructureContainer>);
+        }
+
+        log(`Room ${this.name} has no link or container found at controller range 4 or less`);
+    },
+    enumerable: false,
+    configurable: true
+});
+
+Room.prototype.creepsByRole = function (role: CreepRole) {
+    return _.filter(Game.creeps, creep => creep.room.name == this.name && creep.memory.role == role);
+};
+
+Object.defineProperty(Room.prototype, 'creeps', {
+    get() {
+        return _.filter(Game.creeps, creep => creep.room.name == this.name);
     },
     enumerable: false,
     configurable: true

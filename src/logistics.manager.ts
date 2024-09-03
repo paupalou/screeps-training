@@ -1,5 +1,6 @@
+import { CreepRole } from './creep';
 import { SpawnQueue } from './spawnQueue';
-import { table } from './utils';
+import { log, table } from './utils';
 
 export class LogisticsManager {
     room: Room;
@@ -40,36 +41,32 @@ export class LogisticsManager {
         table(links, ['Link Position', 'Link Energy'], `Links for room ${this.room.name}`);
     }
 
+    get needSpawnTransporter() {
+        const transportersInRoom = this.room.creepsByRole(CreepRole.TRANSPORTER);
+        log(`There are ${transportersInRoom.length} transporters in room ${this.room.name}`);
+
+        return false;
+    }
+
     work() {
-        const containerCloseToController = this.room.controller?.pos.findInRange(FIND_STRUCTURES, 3, {
-            filter: s => s.structureType == STRUCTURE_CONTAINER
-        });
+        // const energyFrom = this.room.controllerEnergyFrom;
 
-        // table((containerCloseToController ?? []).reduce((acc,curr) => {
-        //   return {
-        //     ...acc,
-        //     [`${curr.pos.x},${curr.pos.y}`]: true,
-        //   }
-        // }, {} as Record<string, unknown>), ['Container Position'], `Containers close to controller in room ${this.room.name}`);
+        // log(energyFrom ?? 'no energy from')
+        // if (energyFrom) {
+        //     const containerSpots = Object.values(this.room.memory.containerSpots);
+        //     const hasAssignedContainer = _.some(
+        //         containerSpots,
+        //         ([containerX, containerY]) => energyFrom.pos.x == containerX && energyFrom.pos.y == containerY
+        //     );
+        //     if (hasAssignedContainer) {
+        //         log(`Strucutre (${energyFrom.pos.x},${energyFrom.pos.y}) is already filled by a source`);
+        //     }
+        // }
 
-        const containersDistanceToSpawn = this.room.containers
-            .filter(container => {
-                if (containerCloseToController?.length) {
-                    return container.id != containerCloseToController[0].id;
-                }
-
-                return true;
-            })
-            .reduce(
-                (acc, container) => {
-                    return {
-                        ...acc,
-                        [`${container.pos.x},${container.pos.y}`]: PathFinder.search(this.room.spawn.pos, container.pos)
-                            .cost
-                    };
-                },
-                {} as Record<string, unknown>
-            );
+        if (this.needSpawnTransporter) {
+          console.log('woot')
+            // this.spawnQueue.add(() => this.spawnHarvester());
+        }
 
         // table(containersDistanceToSpawn, ['Container Position', 'Distance to spawn'], `Distance for container-spawn in room ${this.room.name}`);
         // this.#debugContainers();

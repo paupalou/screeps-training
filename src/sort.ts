@@ -71,3 +71,13 @@ export function byLessTicksToLive(creepA: Creep, creepB: Creep) {
 
     return 0;
 }
+
+export function byLessDistance([, costA]: [id: string, cost: number], [,costB]: [id: string, cost: number]) {
+    if (costA > costB) {
+      return 1;
+    } else if (costB > costA) {
+      return -1;
+    }
+
+    return 0;
+}

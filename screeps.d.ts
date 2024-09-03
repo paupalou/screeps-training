@@ -45,6 +45,8 @@ declare global {
     }
 
     interface Room extends Room {
+        creeps: Creep[];
+        creepsByRole: (role: CreepRole) => Creep[];
         spawn: StructureSpawn;
         unfinishedSpawn: StructureSpawn;
         sources: Source[];
@@ -52,6 +54,7 @@ declare global {
         towers: StructureTower[];
         containers: StructureContainer[];
         links: StructureLinks[];
+        controllerEnergyFrom: StructureLink | StructureContainer | undefined;
     }
 
     // Prototypes

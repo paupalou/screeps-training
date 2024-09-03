@@ -1,11 +1,15 @@
 import { RoomMap } from './room.map';
-import { byFarestTo } from './sort';
+import { byFarestTo, byLessDistance } from './sort';
 import { getAdjacentPositions, log } from './utils';
 
 export class RoomAnalyst {
     static work(room: Room) {
+        // base
+        RoomAnalyst.findBaseEnergyFrom(room);
+
         // controller
         RoomAnalyst.findControllerUpgraderSpots(room);
+        RoomAnalyst.findContainerController(room);
 
         // sources
         RoomAnalyst.findBestHarvestEnergySpots(room);
@@ -13,6 +17,69 @@ export class RoomAnalyst {
 
         // minerals
         RoomAnalyst.findBestExtractMineralSpots(room);
+    }
+
+    static findBaseEnergyFrom(room: Room) {
+        if (!room.controller || !room.controller.my) {
+            return;
+        }
+
+        if (room.memory.baseEnergyFrom) {
+            return;
+        }
+
+        const containerController = room.memory.containerController;
+        const linkController = room.memory.linkController;
+        const containersDistanceToSpawn = room.containers
+            .filter(container => {
+                if (container.id == containerController || container.id == linkController) {
+                    return false;
+                }
+
+                return true;
+            })
+            .reduce(
+                (acc, container) => {
+                    return {
+                        ...acc,
+                        [container.id]: PathFinder.search(room.spawn.pos, container.pos).cost
+                    };
+                },
+                {} as Record<string, number>
+            );
+
+        const foundStructuctures = Object.entries(containersDistanceToSpawn);
+        if (foundStructuctures.length > 0) {
+            log(`Setting base energy from in memory for room ${room.name}`);
+            room.memory.baseEnergyFrom = foundStructuctures.sort(byLessDistance)[0][0];
+        }
+    }
+
+    static findContainerController(room: Room) {
+        if (!room.controller || !room.controller.my) {
+            return;
+        }
+
+        if (room.memory.linkController || room.memory.containerController) {
+            return;
+        }
+
+        const linkCloseToController = room.controller?.pos.findInRange(FIND_STRUCTURES, 4, {
+            filter: s => s.structureType == STRUCTURE_LINK
+        });
+
+        if (linkCloseToController.length > 0) {
+            room.memory.linkController = linkCloseToController[0].id;
+            return;
+        }
+
+        const containerCloseToController = room.controller?.pos.findInRange(FIND_STRUCTURES, 4, {
+            filter: s => s.structureType == STRUCTURE_CONTAINER
+        });
+
+        if (containerCloseToController.length > 0) {
+            room.memory.containerController = containerCloseToController[0].id;
+        }
     }
 
     static findControllerUpgraderSpots(room: Room) {
